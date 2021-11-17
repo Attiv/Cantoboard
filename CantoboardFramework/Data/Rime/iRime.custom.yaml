@@ -1,0 +1,8 @@
+patch:
+  app_setting:
+    candidate_preedit_type: 3
+    theme_name: iPhone
+    play_key_voice: true
+    is_insert_symbol_auto_insert_candiate: true
+    is_show_candidate_comment: true
+    current_chinese_type: 2

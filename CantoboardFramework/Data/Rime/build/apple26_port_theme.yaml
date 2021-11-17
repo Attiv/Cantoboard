@@ -1,0 +1,292 @@
+# Trime default style settings
+# encoding: utf-8
+
+config_version: "1.0"
+name: iOS原生键盘 # 主题名称
+author: 白焕 # 作者
+
+# 键盘高度
+height:
+  1: &ajgd 48 # 按键高度
+  2: &hxgd 45 # 候选栏高度
+  3: &sxjj 10 # 按键上下间距
+  4: &zyjj 6 # 按键左右间距
+  5: &ajyj 55 # 按键圆角
+
+hide:
+  &hide true # false不显示候选窗或true显示候选窗
+
+style:
+  candidate_font: han.ttf # 候选字体
+  candidate_padding: 5 # 候选项内边距
+  candidate_spacing: 15 # 候选间距
+  candidate_text_size: 20 # 候选字号
+  candidate_use_cursor: true # 高亮候选项
+  candidate_view_height: *hxgd # 候选栏高度
+  comment_height: 12 # 编码提示区高度
+  comment_on_top: false # 编码提示在上方或右侧
+  comment_text_size: 10 # 编码提示字号
+  key_font: symbol.ttf # 键盘字体
+  key_height: *ajgd # 按键高度
+  key_long_text_size: 14 # 长标签字号
+  key_text_size: 18 # 键字号
+  key_width: 10.0 # 键宽，占屏幕宽的百分比
+  keyboards: [default, english, number, symbols] # 键盘申明
+  label_text_size: 20 # 标签字号
+  preview_text_size: 40 # 按键提示字号
+  show_candidate: *hide # 显示候选区
+  show_comment: true # 显示提示区
+  show_preview: false # 按键提示
+  symbol_text_size: 10 # 符号字号
+  text_size: 16 # 编码区字号
+  vertical_correction: -5
+  vertical_gap: *sxjj # 按键上下间距
+
+# 键盘布局
+preset_keyboards:
+  default:
+    name: "中文键盘"
+    author: "白焕"
+    ascii_mode: 0
+    height: *ajgd
+    vertical_gap: *sxjj
+    horizontal_gap: *zyjj
+    round_corner: *ajyj
+    keys: 
+      - {click: q, label: Q, swipe_up: commit1, swipe_down: "一"}
+      - {click: w, label: W, swipe_up: commit2, swipe_down: "二"}
+      - {click: e, label: E, swipe_up: commit3, swipe_down: "三"}
+      - {click: r, label: R, swipe_up: commit4, swipe_down: "四"}
+      - {click: t, label: T, swipe_up: commit5, swipe_down: "五"}
+      - {click: y, label: Y, swipe_up: commit6, swipe_down: "六"}
+      - {click: u, label: U, swipe_up: commit7, swipe_down: "七"}
+      - {click: i, label: I, swipe_up: commit8, swipe_down: "八"}
+      - {click: o, label: O, swipe_up: commit9, swipe_down: "九"}
+      - {click: p, label: P, swipe_up: commit0, swipe_down: "〇"}
+      - {width: 5}
+      - {click: a, label: A, swipe_up: "～", swipe_down: "~"}
+      - {click: s, label: S, swipe_up: "、", swipe_down: "/"}
+      - {click: d, label: D, swipe_up: "：", swipe_down: ":"}
+      - {click: f, label: F, swipe_up: "；", swipe_down: ";"}
+      - {click: g, label: G, swipe_up: bracket, swipe_down: "("}
+      - {click: h, label: H, swipe_up: "）", swipe_down: ")"}
+      - {click: j, label: J, swipe_up: "@", swipe_down: "@"}
+      - {click: k, label: K, swipe_up: quotationMarkFull, swipe_down: '"'}
+      - {click: l, label: L, swipe_up: "'", swipe_down: "'"}
+      - {width: 5}
+      - {click: Shift, width: 12.5}
+      - {width: 2.5}
+      - {click: z, label: Z, swipe_up: "`", swipe_down: "-"}
+      - {click: x, label: X, swipe_up: "——", swipe_down: "_"}
+      - {click: c, label: C, swipe_up: "#", swipe_down: "#"}
+      - {click: v, label: V, swipe_up: "？", swipe_down: "?"}
+      - {click: b, label: B, swipe_up: "！", swipe_down: "!"}
+      - {click: n, label: N, swipe_up: "，", swipe_down: ","}
+      - {click: m, label: M, swipe_up: "。", swipe_down: "."}
+      - {width: 2.5}
+      - {click: BackSpace, width: 12.5}
+      - {click: number, width: 12.5}
+      - {click: english, width: 12.5}
+      - {click: space, width: 50}
+      - {click: Return, width: 25}
+    width: 10
+
+  english:
+    name: "英文键盘"
+    author: "白焕"
+    ascii_mode: 1
+    height: *ajgd
+    vertical_gap: *sxjj
+    horizontal_gap: *zyjj
+    round_corner: *ajyj
+    keys: 
+      - {click: q, swipe_up: commit1, swipe_down: "一"}
+      - {click: w, swipe_up: commit2, swipe_down: "二"}
+      - {click: e, swipe_up: commit3, swipe_down: "三"}
+      - {click: r, swipe_up: commit4, swipe_down: "四"}
+      - {click: t, swipe_up: commit5, swipe_down: "五"}
+      - {click: y, swipe_up: commit6, swipe_down: "六"}
+      - {click: u, swipe_up: commit7, swipe_down: "七"}
+      - {click: i, swipe_up: commit8, swipe_down: "八"}
+      - {click: o, swipe_up: commit9, swipe_down: "九"}
+      - {click: p, swipe_up: commit0, swipe_down: "〇"}
+      - {width: 5}
+      - {click: a, swipe_up: "～", swipe_down: "~"}
+      - {click: s, swipe_up: "、", swipe_down: "/"}
+      - {click: d, swipe_up: "：", swipe_down: ":"}
+      - {click: f, swipe_up: "；", swipe_down: ";"}
+      - {click: g, swipe_up: bracket, swipe_down: "("}
+      - {click: h, swipe_up: "）", swipe_down: ")"}
+      - {click: j, swipe_up: "@", swipe_down: "@"}
+      - {click: k, swipe_up: quotationMarkFull, swipe_down: '"'}
+      - {click: l, swipe_up: "'", swipe_down: "'"}
+      - {width: 5}
+      - {click: Shift, width: 12.5}
+      - {width: 2.5}
+      - {click: z, swipe_up: "`", swipe_down: "-"}
+      - {click: x, swipe_up: "——", swipe_down: "_"}
+      - {click: c, swipe_up: "#", swipe_down: "#"}
+      - {click: v, swipe_up: "？", swipe_down: "?"}
+      - {click: b, swipe_up: "！", swipe_down: "!"}
+      - {click: n, swipe_up: "，", swipe_down: ","}
+      - {click: m, swipe_up: "。", swipe_down: "."}
+      - {width: 2.5}
+      - {click: BackSpace, width: 12.5}
+      - {click: number, width: 12.5}
+      - {click: chinese, width: 12.5}
+      - {click: space, width: 50}
+      - {click: Return, width: 25}
+    width: 10
+
+  number:
+    name: "数字键盘"
+    author: "白焕"
+    ascii_mode: 0
+    height: *ajgd
+    vertical_gap: *sxjj
+    horizontal_gap: *zyjj
+    round_corner: *ajyj
+    keys: 
+      - {click: 1, swipe_up: "壹", swipe_down: "Ⅰ"}
+      - {click: 2, swipe_up: "贰", swipe_down: "Ⅱ"}
+      - {click: 3, swipe_up: "叁", swipe_down: "Ⅲ"}
+      - {click: 4, swipe_up: "肆", swipe_down: "Ⅳ"}
+      - {click: 5, swipe_up: "伍", swipe_down: "Ⅴ"}
+      - {click: 6, swipe_up: "陆", swipe_down: "Ⅵ"}
+      - {click: 7, swipe_up: "柒", swipe_down: "Ⅶ"}
+      - {click: 8, swipe_up: "捌", swipe_down: "Ⅷ"}
+      - {click: 9, swipe_up: "玖", swipe_down: "Ⅸ"}
+      - {click: 0, swipe_up: "零", swipe_down: "Ⅹ"}
+      - {click: "-"}
+      - {click: "/"}
+      - {click: ":"}
+      - {click: semicolon}
+      - {click: bracket}
+      - {click: bracket1}
+      - {click: "¥"}
+      - {click: at1}
+      - {click: quotationMarkFull}
+      - {click: quotationMarkFull1}
+      - {click: symbols, width: 12.5}
+      - {width: 1.5}
+      - {click: periodFull, width: 12}
+      - {click: commaFull, width: 12}
+      - {click: dunHalf, width: 12}
+      - {click: questionMark, width: 12}
+      - {click: point, width: 12}
+      - {click: commit., width: 12}
+      - {width: 1.5}
+      - {click: BackSpace, width: 12.5}
+      - {click: DefaultKeyboard, width: 12.5}
+      - {click: english, width: 12.5}
+      - {click: space, width: 50}
+      - {click: Return, width: 25}
+    width: 10
+
+  symbols:
+    name: "符号键盘"
+    author: "白焕"
+    ascii_mode: 0
+    height: *ajgd
+    vertical_gap: *sxjj
+    horizontal_gap: *zyjj
+    round_corner: *ajyj
+    keys: 
+      - {click: symbol1}
+      - {click: symbol2}
+      - {click: symbol3}
+      - {click: symbol4}
+      - {click: symbol5}
+      - {click: symbol6}
+      - {click: symbol7}
+      - {click: symbol8}
+      - {click: symbol9}
+      - {click: symbol10}
+      - {click: symbol11}
+      - {click: symbol12}
+      - {click: symbol13}
+      - {click: symbol14}
+      - {click: "~"}
+      - {click: symbol15}
+      - {click: symbol16}
+      - {click: "$"}
+      - {click: symbol17}
+      - {click: symbol18}
+      - {click: number, width: 12.5}
+      - {width: 1.5}
+      - {click: "…", width: 12}
+      - {click: symbol19, width: 12}
+      - {click: symbol20, width: 12}
+      - {click: symbol21, width: 12}
+      - {click: symbol22, width: 12}
+      - {click: symbol23, width: 12}
+      - {width: 1.5}
+      - {click: BackSpace, width: 12.5}
+      - {click: DefaultKeyboard, width: 12.5}
+      - {click: english, width: 12.5}
+      - {click: space, width: 50}
+      - {click: Return, width: 25}
+    width: 10
+
+preset_keys:
+  # 功能预设键
+  Shift: {label: Shift, send: Shift_L}
+  Return: {label: Enter, functional: false, send: Return}
+  BackSpace: {send: BackSpace}
+  space: {label: "空格", send: space}
+  chinese: {label: 中文, send: Eisu_toggle, select: default}
+  english: {label: "abc", send: Eisu_toggle, select: english}
+  number: {label: 123, send: Eisu_toggle, select: number}
+  symbols: {label: "#+=", send: Eisu_toggle, select: symbols}
+  .symbols: {label: "符号", send: Eisu_toggle, select: .symbols}
+  .number: {label: 123, send: Eisu_toggle, select: .number}
+  DefaultKeyboard: {label: 返回, send: Eisu_toggle, select: default}
+
+# 符号预设键
+  semicolon: {label: "；", text: ";{DefaultKeyboard}"} #先上屏；再跳转到default键盘
+  bracket: {label: "(", text: "(){Left}{DefaultKeyboard}"} #先上屏()光标往左移动一格再跳转到default键盘
+  bracket1: {label: ")", text: "){DefaultKeyboard}"} 
+  at1: {label: "@", text: "@{DefaultKeyboard}"} 
+  quotationMarkFull: {label: "〝", text: "〝〞{Left}{DefaultKeyboard}"} 
+  quotationMarkFull1: {label: "〞", text: "〞＂{DefaultKeyboard}"}
+  periodFull: {label: "。", text: "。{DefaultKeyboard}"} #上屏全角句号再跳转到default键盘
+  commaHalf: {label: ",", commit: ","}
+  commaFull: {label: "，", text: "，{DefaultKeyboard}"}
+  dunHalf: {label: "、", text: "、{DefaultKeyboard}"}
+  questionMark: {label: "？", text: "？{DefaultKeyboard}"}
+  point: {label: "！", text: "！{DefaultKeyboard}"}
+  commit.: {label: ".", commit: "."}
+  symbol1: {label: "【", text: "【{DefaultKeyboard}"}
+  symbol2: {label: "】", text: "】{DefaultKeyboard}"}
+  symbol3: {label: "{", text: "{{DefaultKeyboard}"}
+  symbol4: {label: "}", text: "}{DefaultKeyboard}"}
+  symbol5: {label: "#", text: "#{DefaultKeyboard}"}
+  symbol6: {label: "%", text: "%{DefaultKeyboard}"}
+  symbol7: {label: "^", text: "^{DefaultKeyboard}"}
+  symbol8: {label: "*", text: "*{DefaultKeyboard}"}
+  symbol9: {label: "+", text: "+{DefaultKeyboard}"}
+  symbol10: {label: "=", text: "={DefaultKeyboard}"}
+  symbol11: {label: "_", text: "_{DefaultKeyboard}"}
+  symbol12: {label: "—", text: "——{DefaultKeyboard}"}
+  symbol13: {label: "\\", text: "\\{DefaultKeyboard}"}
+  symbol14: {label: "|", text: "|{DefaultKeyboard}"}
+  symbol15: {label: "《", text: "《{DefaultKeyboard}"}
+  symbol16: {label: "》", text: "》{DefaultKeyboard}"}
+  symbol17: {label: "&", text: "&{DefaultKeyboard}"}
+  symbol18: {label: "·", text: "·{DefaultKeyboard}"}
+  symbol19: {label: "，", text: "，{DefaultKeyboard}"}
+  symbol20: {label: "の", text: "の{DefaultKeyboard}"}
+  symbol21: {label: "?", text: "?{DefaultKeyboard}"}
+  symbol22: {label: "!", text: "!{DefaultKeyboard}"}
+  symbol23: {label: "´", text: "´{DefaultKeyboard}"}
+
+  commit1: {label: "1", commit: "1"}
+  commit2: {label: "2", commit: "2"}
+  commit3: {label: "3", commit: "3"}
+  commit4: {label: "4", commit: "4"}
+  commit5: {label: "5", commit: "5"}
+  commit6: {label: "6", commit: "6"}
+  commit7: {label: "7", commit: "7"}
+  commit8: {label: "8", commit: "8"}
+  commit9: {label: "9", commit: "9"}
+  commit0: {label: "0", commit: "0"}
