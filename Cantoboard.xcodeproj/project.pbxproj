@@ -1609,14 +1609,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = Cantoboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.9;
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.Cantoboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -1633,14 +1633,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = Cantoboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.9;
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.Cantoboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -1656,14 +1656,14 @@
 				CODE_SIGN_ENTITLEMENTS = CantoboardTestApp/CantoboardTestApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardTestApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.CantoboardTestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1.CantoboardTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1678,14 +1678,14 @@
 				CODE_SIGN_ENTITLEMENTS = CantoboardTestApp/CantoboardTestApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardTestApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.CantoboardTestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1.CantoboardTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1699,7 +1699,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1708,7 +1708,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.1.9;
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.Cantoboard.CantoboardExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1.CantoboardExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -1724,7 +1724,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = M6QD9W76V2;
+				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1733,7 +1733,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.1.9;
-				PRODUCT_BUNDLE_IDENTIFIER = org.cantoboard.Cantoboard.CantoboardExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vitta.1.CantoboardExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
