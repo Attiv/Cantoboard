@@ -11,12 +11,13 @@ import UIKit
 import CocoaLumberjackSwift
 
 public enum RimeSchema: String, Codable {
+//    case jyutping = "xhup"
     case jyutping = "jyut6ping3"
     case yale = "yale"
     case cangjie = "cangjie5"
     case quick = "quick5"
 //    case mandarin = "luna_pinyin"
-    case mandarin = "flypy"
+    case mandarin = "xhup"
     case stroke = "stroke"
     case loengfan = "loengfan"
     
@@ -27,7 +28,7 @@ public enum RimeSchema: String, Codable {
         case .quick: return "速"
         case .jyutping: return "粵"
         case .loengfan: return "兩"
-        case .mandarin: return "普"
+        case .mandarin: return "音"
         case .stroke: return "筆"
         }
     }
@@ -39,7 +40,7 @@ public enum RimeSchema: String, Codable {
         case .quick: return "速成"
         case .jyutping: return "粵拼"
         case .loengfan: return "兩分"
-        case .mandarin: return "普拼"
+        case .mandarin: return "音形"
         case .stroke: return "筆劃"
         }
     }
@@ -125,6 +126,10 @@ class RimeInputEngine: NSObject, InputEngine {
         var text = composition?.text ?? ""
         text.append(append)
         return text
+    }
+    
+    func getCommitedText() -> String {
+        return rimeSession?.getCommitedText() ?? ""
     }
     
     private func processKey(_ keycode: Int32, _ modifier: Int32 = 0) {

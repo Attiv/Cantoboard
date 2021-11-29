@@ -82,6 +82,7 @@ struct KeyboardState: Equatable {
 }
 
 class InputController: NSObject {
+    var rimeInputEngine: RimeInputEngine?
     private weak var keyboardViewController: KeyboardViewController?
     private weak var keyboardView: BaseKeyboardView?
     private(set) var inputEngine: BilingualInputEngine!
@@ -172,7 +173,9 @@ class InputController: NSObject {
     }
     
     func textDidChange(_ textInput: UITextInput?) {
-        // DDLogInfo("textDidChange prevTextBefore '\(prevTextBefore ?? "nil")' textBeforeInput '\(compositionRenderer.textBeforeInput)' doc '\(textDocumentProxy?.documentContextBeforeInput ?? "nil")'")
+        print("********************")
+         DDLogInfo("textDidChange prevTextBefore '\(prevTextBefore ?? "nil")' textBeforeInput '\(compositionRenderer.textBeforeInput)' doc '\(textDocumentProxy?.documentContextBeforeInput ?? "nil")'")
+        DDLogInfo(textInput)
         shouldApplyChromeSearchBarHack = isTextFieldWebSearch() && !isImmediateMode
         
         let textBeforeInput = compositionRenderer.textBeforeInput
@@ -606,6 +609,7 @@ class InputController: NSObject {
     }
     
     private func updateInputState() {
+        
         updateContextualSuggestion()
         candidateOrganizer.updateCandidates(reload: needReloadCandidates)
         
@@ -623,7 +627,15 @@ class InputController: NSObject {
             }
         }
         state.isComposing = isComposing
+        DDLogInfo(isComposing)
         keyboardView?.state = state
+        let text = rimeInputEngine!.getCommitedText()
+        if (text.count > 0) {
+            insertText(text)
+        }
+//        DDLogInfo(text)
+        
+        
     }
     
     private func updateComposition() {

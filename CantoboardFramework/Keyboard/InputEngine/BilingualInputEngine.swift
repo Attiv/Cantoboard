@@ -27,6 +27,7 @@ class BilingualInputEngine: InputEngine {
     init(inputController: InputController, rimeSchema: RimeSchema) {
         self.inputController = inputController
         rimeInputEngine = RimeInputEngine(schema: rimeSchema)
+        self.inputController?.rimeInputEngine = rimeInputEngine
         englishInputEngine = EnglishInputEngine()
     }
 
