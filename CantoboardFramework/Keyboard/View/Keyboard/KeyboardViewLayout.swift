@@ -44,8 +44,8 @@ class CommonContextualKeys {
                 }
                 return .character(".", "/", children)
             }
-        case ",": return keyboardState.keyboardContextualType.isEnglish ? "," : "，"
-        case ".": return keyboardState.keyboardContextualType.isEnglish ? "." : "。"
+        case ",": return keyboardState.keyboardContextualType.halfWidthSymbol ? "," : "，"
+        case ".": return keyboardState.keyboardContextualType.halfWidthSymbol ? "." : "。"
         case .url: // For iPads
             let domains = [".net", ".org", ".edu", ".com", String("." + SessionState.main.localDomain), ".hk", ".tw", ".mo", ".cn", ".uk", ".jp"].unique()
             return .character(".com", nil, domains.map{ .character($0, nil, nil) })
@@ -56,7 +56,7 @@ class CommonContextualKeys {
 
 class CommonSwipeDownKeys {
     static func getSwipeDownKeyCapForPadShortOrFull4Rows(keyCap: KeyCap, keyboardState: KeyboardState) -> KeyCap? {
-        let isInChineseContextualMode = !keyboardState.keyboardContextualType.isEnglish
+        let isInChineseContextualMode = !keyboardState.keyboardContextualType.halfWidthSymbol
         let keyCapCharacter: String?
         switch keyCap {
         case .character(let c, _, _), .cangjie(let c, _): keyCapCharacter = c.lowercased()
@@ -82,12 +82,12 @@ class CommonSwipeDownKeys {
         case "f": return isInChineseContextualMode ? "／" : "/"
         case "g": return isInChineseContextualMode ? "（" : "("
         case "h": return isInChineseContextualMode ? "）" : ")"
-        case "j": return isInChineseContextualMode ? "「" : "｢"
-        case "k": return isInChineseContextualMode ? "」" : "｣"
+        case "j": return "「"
+        case "k": return "」"
         case "l": return .singleQuote
         case "z": return "%"
-        case "x": return "-"
-        case "c": return isInChineseContextualMode ? "~" : "～"
+        case "x": return isInChineseContextualMode ? "—" : "-"
+        case "c": return isInChineseContextualMode ? "～" : "~"
         case "v": return isInChineseContextualMode ? "⋯" : "…"
         case "b": return isInChineseContextualMode ? "、" : "､"
         case "n": return isInChineseContextualMode ? "；" : ";"
@@ -111,10 +111,11 @@ class CommonSwipeDownKeys {
         case "」": return "｝"
         case "'": return .doubleQuote
         case "%": return "*"
-        case "-", "–": return "&"
+        case "-", "—": return "&"
         case "~", "～": return "+"
         case "…", "⋯": return "="
-        case "､", "、": return "·"
+        case "､": return "•"
+        case "、": return "·"
         case ";": return "<"
         case "；": return "《"
         case ":": return ">"

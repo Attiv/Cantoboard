@@ -21,7 +21,6 @@ protocol CandidatePaneViewDelegate: NSObject {
 }
 
 class CandidatePaneView: UIControl {
-    private static let hapticsGenerator = UIImpactFeedbackGenerator(style: .rigid)
     private static let miniStatusSize = CGSize(width: 20, height: 20)
     
     // Uncomment this to debug memory leak.
@@ -157,16 +156,17 @@ class CandidatePaneView: UIControl {
         }
         
         candidateOrganizer.onReloadCandidates = { [weak self] candidateOrganizer in
-            guard let self = self,
-                  let collectionView = self.collectionView else { return }
+            guard let self = self else { return }
             
             DDLogInfo("Reloading candidates.")
             
             let originalCandidatePaneMode = self.mode
-            let originalContentOffset: CGPoint = collectionView.contentOffset
+            let originalContentOffset: CGPoint = self.collectionView.contentOffset
             
             UIView.performWithoutAnimation {
-                collectionView.scrollOnLayoutSubviews = {
+                self.collectionView.scrollOnLayoutSubviews = { [weak self] in
+                    guard let self = self,
+                          let collectionView = self.collectionView else { return true }
                     if originalCandidatePaneMode == self.mode && self.shouldPreserveCandidateOffset {
                         if originalCandidatePaneMode == .table  {
                             // Preserve contentOffset on toggling charForm
@@ -186,7 +186,7 @@ class CandidatePaneView: UIControl {
                     self.shouldPreserveCandidateOffset = false
                     return true
                 }
-                collectionView.reloadCandidates()
+                self.collectionView.reloadCandidates()
                 if self.collectionView.numberOfSections < 1 ||
                     self.collectionView(self.collectionView, numberOfItemsInSection: 1) == 0 {
                     self.changeMode(.row)
@@ -212,20 +212,20 @@ class CandidatePaneView: UIControl {
     
     private func createButtons() {
         expandButton = createAndAddButton(isStatusIndicator: false)
-        expandButton.addTarget(self, action: #selector(self.expandButtonClick), for: .touchDown)
+        expandButton.addTarget(self, action: #selector(self.expandButtonClick), for: .touchUpInside)
 
         inputModeButton = (createAndAddButton(isStatusIndicator: true) as! StatusButton)
-        inputModeButton.addTarget(self, action: #selector(self.filterButtonClick), for: .touchDown)
+        inputModeButton.addTarget(self, action: #selector(self.filterButtonClick), for: .touchUpInside)
         inputModeButton.handleStatusMenu = { [weak self] in
             return self?.handleStatusMenu(from: $0, with: $1) ?? false
         }
         sendSubviewToBack(inputModeButton)
         
         backspaceButton = createAndAddButton(isStatusIndicator: false)
-        backspaceButton.addTarget(self, action: #selector(self.backspaceButtonClick), for: .touchDown)
+        backspaceButton.addTarget(self, action: #selector(self.backspaceButtonClick), for: .touchUpInside)
         
         charFormButton = createAndAddButton(isStatusIndicator: true)
-        charFormButton.addTarget(self, action: #selector(self.charFormButtonClick), for: .touchDown)
+        charFormButton.addTarget(self, action: #selector(self.charFormButtonClick), for: .touchUpInside)
     }
     
     private func createAndAddButton(isStatusIndicator: Bool) -> UIButton {
@@ -305,6 +305,8 @@ class CandidatePaneView: UIControl {
     
     private func createCollectionView() {
         let collectionViewLayout = CandidateCollectionViewFlowLayout(candidatePaneView: self)
+        collectionViewLayout.scrollDirection = mode == .row ? .horizontal : .vertical
+        collectionViewLayout.minimumLineSpacing = rowPadding
         
         let collectionView = CandidateCollectionView(frame :.zero, collectionViewLayout: collectionViewLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -317,10 +319,6 @@ class CandidatePaneView: UIControl {
         collectionView.allowsSelection = true
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
-        
-        let flowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        flowLayout.scrollDirection = mode == .row ? .horizontal : .vertical
-        flowLayout.minimumLineSpacing = rowPadding
         
         self.addSubview(collectionView)
         self.collectionView = collectionView
@@ -344,11 +342,13 @@ class CandidatePaneView: UIControl {
     }
     
     @objc private func expandButtonClick() {
+        FeedbackProvider.rigidImpact.impactOccurred()
+        
         changeMode(mode == .row ? .table : .row)
     }
     
     @objc private func filterButtonClick() {
-        Self.hapticsGenerator.impactOccurred(intensity: 1)
+        FeedbackProvider.rigidImpact.impactOccurred()
         FeedbackProvider.play(keyboardAction: .none)
         
         if statusIndicatorMode == .lang {
@@ -364,7 +364,7 @@ class CandidatePaneView: UIControl {
     }
     
     @objc private func charFormButtonClick() {
-        Self.hapticsGenerator.impactOccurred(intensity: 1)
+        FeedbackProvider.rigidImpact.impactOccurred()
         FeedbackProvider.play(keyboardAction: .none)
         
         let currentCharForm = SessionState.main.lastCharForm
@@ -446,7 +446,8 @@ extension CandidatePaneView {
         if let scrollToIndexPath = firstVisibleIndexPath {
             let scrollToIndexPathDirection: UICollectionView.ScrollPosition = newMode == .row ? .left : .top
             if mode == .table && groupByEnabled && scrollToIndexPath.section <= 1 && scrollToIndexPath.row == 0 {
-                collectionView.scrollOnLayoutSubviews = {
+                collectionView.scrollOnLayoutSubviews = { [weak self] in
+                    guard let self = self else { return true }
                     let candindateBarHeight = self.rowHeight
                     
                     self.collectionView.setContentOffset(CGPoint(x: 0, y: candindateBarHeight), animated: false)
@@ -455,7 +456,8 @@ extension CandidatePaneView {
                     return true
                 }
             } else {
-                collectionView.scrollOnLayoutSubviews = {
+                collectionView.scrollOnLayoutSubviews = { [weak self] in
+                    guard let self = self else { return true }
                     guard let collectionView = self.collectionView else { return false }
                     
                     guard scrollToIndexPath.section < collectionView.numberOfSections else { return false }
@@ -507,10 +509,6 @@ extension CandidatePaneView {
         return self.collectionView.indexPathForItem(at: self.convert(CGPoint(x: candidateCharSize.width / 2, y: candidateCharSize.height / 2 + 2 * rowHeight), to: self.collectionView))
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-    }
-    
     func scrollToNextPageInRowMode() {
         guard mode == .row,
               let collectionView = self.collectionView else { return }
@@ -552,7 +550,7 @@ extension CandidatePaneView: UICollectionViewDataSource {
         cell.setup(
             groupByModes: candidateOrganizer.supportedGroupByModes,
             selectedGroupByMode: candidateOrganizer.groupByMode,
-            onSelectionChanged: onGroupBySegmentControlSelectionChanged)
+            onSelectionChanged: { [weak self] in self?.onGroupBySegmentControlSelectionChanged($0) })
         
         return cell
     }

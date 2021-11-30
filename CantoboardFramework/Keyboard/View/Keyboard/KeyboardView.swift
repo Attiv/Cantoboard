@@ -26,15 +26,15 @@ class KeyboardView: UIView, BaseKeyboardView {
     private var candidateOrganizer: CandidateOrganizer
     
     internal weak var statusMenu: StatusMenu?
-    private var candidatePaneView: CandidatePaneView?
-    private var emojiView: EmojiView?
+    private weak var candidatePaneView: CandidatePaneView?
+    private weak var emojiView: EmojiView?
     private var keyRows: [KeyRowView]!
     
-    private var touchHandler: TouchHandler!
+    private var touchHandler: TouchHandler?
     // Touch event near the screen edge are delayed.
     // Overriding preferredScreenEdgesDeferringSystemGestures doesnt work in UIInputViewController,
     // As a workaround we use UILongPressGestureRecognizer to detect taps without delays.
-    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
+    private weak var longPressGestureRecognizer: UILongPressGestureRecognizer!
     
     internal weak var layoutConstants: Reference<LayoutConstants>?
     private weak var newLineKey: KeyView?
@@ -62,16 +62,30 @@ class KeyboardView: UIView, BaseKeyboardView {
         isMultipleTouchEnabled = true
         preservesSuperviewLayoutMargins = false
         
-        initTouchHandler()
+        createsGestureRecognizer()
         createCandidatePaneView()
         
         setupView()
     }
     
-    private func initTouchHandler() {
-        longPressGestureRecognizer = BypassScreenEdgeTouchDelayGestureRecognizer(keyboardView: self)
+    public override func didMoveToSuperview() {
+        if superview == nil {
+            touchHandler = nil
+        } else {
+            initTouchHandler()
+        }
+    }
+    
+    private func createsGestureRecognizer() {
+        let longPressGestureRecognizer = BypassScreenEdgeTouchDelayGestureRecognizer(onTouchesBegan: { [weak self] touches, event in
+            guard let self = self else { return }
+            self.touchesBeganFromGestureRecoginzer(touches, with: event)
+        })
         addGestureRecognizer(longPressGestureRecognizer)
-        
+        self.longPressGestureRecognizer = longPressGestureRecognizer
+    }
+    
+    private func initTouchHandler() {
         touchHandler = TouchHandler(keyboardView: self, keyboardIdiom: state.keyboardIdiom)
     }
     
@@ -112,7 +126,7 @@ class KeyboardView: UIView, BaseKeyboardView {
         }
         
         if prevState.keyboardIdiom != newState.keyboardIdiom {
-            touchHandler.keyboardIdiom = newState.keyboardIdiom
+            touchHandler?.keyboardIdiom = newState.keyboardIdiom
         }
         
         _state = newState
@@ -421,7 +435,7 @@ class KeyboardView: UIView, BaseKeyboardView {
         if isLoading && loadingIndicatorView == nil {
             createLoadingIndicatorView()
             candidatePaneView?.isHidden = true
-            touchHandler.cancelAllTouches()
+            touchHandler?.cancelAllTouches()
         } else if !isLoading {
             loadingIndicatorView?.stopAnimating()
             loadingIndicatorView?.removeFromSuperview()
@@ -473,7 +487,7 @@ extension KeyboardView {
         for touch in touches {
             switch touch.view {
             case let key as KeyView:
-                touchHandler.touchBegan(touch, key: key, with: event)
+                touchHandler?.touchBegan(touch, key: key, with: event)
             default: ()
             }
         }
@@ -485,7 +499,7 @@ extension KeyboardView {
         guard statusMenu == nil else { return }
         for touch in touches {
             let key = findTouchingView(touch, with: event) as? KeyView
-            touchHandler.touchMoved(touch, key: key, with: event)
+            touchHandler?.touchMoved(touch, key: key, with: event)
         }
     }
     
@@ -495,7 +509,7 @@ extension KeyboardView {
         guard statusMenu == nil else { return }
         for touch in touches {
             let key = findTouchingView(touch, with: event) as? KeyView
-            touchHandler.touchEnded(touch, key: key, with: event)
+            touchHandler?.touchEnded(touch, key: key, with: event)
         }
     }
     
@@ -504,7 +518,7 @@ extension KeyboardView {
         
         guard statusMenu == nil else { return }
         for touch in touches {
-            touchHandler.touchCancelled(touch, with: event)
+            touchHandler?.touchCancelled(touch, with: event)
         }
     }
     

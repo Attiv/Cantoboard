@@ -22,7 +22,7 @@ class PadFull4RowsKeyboardViewLayout : KeyboardViewLayout {
     
     static let numbersHalf: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
-        [[.placeholder(.toggleInputMode(.english, nil))], ["@", "#", .currency, "/", "(", ")", "｢", "｣", .singleQuote], [.returnKey(.default)]],
+        [[.placeholder(.toggleInputMode(.english, nil))], ["@", "#", .currency, "/", "(", ")", "「", "」", .singleQuote], [.returnKey(.default)]],
         [[.keyboardType(.symbolic)], ["%", "-", "~", "…", "､", ";", ":", ",", "."], [.keyboardType(.symbolic)]],
         [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
@@ -30,7 +30,7 @@ class PadFull4RowsKeyboardViewLayout : KeyboardViewLayout {
     static let numbersFull: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
         [[.placeholder(.toggleInputMode(.english, nil))], ["@", "#", .currency, "／", "（", "）", "「", "」", .singleQuote], [.returnKey(.default)]],
-        [[.keyboardType(.symbolic)], ["%", "–", "～", "⋯", "、", "；", "：", "，", "。"], [.keyboardType(.symbolic)]],
+        [[.keyboardType(.symbolic)], ["%", "—", "～", "⋯", "、", "；", "：", "，", "。"], [.keyboardType(.symbolic)]],
         [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
     
@@ -91,14 +91,7 @@ class PadFull4RowsKeyboardViewLayout : KeyboardViewLayout {
         let totalFixedKeyWidth = keys.reduce(CGFloat(0)) { sum, key in
             let width: CGFloat
             
-            let keyCap: KeyCap
-            if case let .placeholder(keyCapSizer) = key.keyCap {
-                keyCap = keyCapSizer
-            } else {
-                keyCap = key.keyCap
-            }
-            
-            switch keyCap {
+            switch key.keyCap.unescaped {
             case "\t", .backspace: width = padFull4RowsLayoutConstants.tabDeleteKeyWidth
             case .toggleInputMode: width = padFull4RowsLayoutConstants.capLockKeyWidth
             case .shift, .keyboardType(.numeric), .keyboardType(.symbolic):

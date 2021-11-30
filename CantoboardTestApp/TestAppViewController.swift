@@ -18,9 +18,9 @@ class TestAppViewController: UIViewController, UITextViewDelegate {
     func recreateKeyboard() {
         if let keyboard = keyboardController {
             if self.createKeyboard {
-                keyboard.createKeyboardIfNeeded()
+                keyboard.createInputController()
             } else {
-                keyboard.destroyKeyboard()
+                keyboard.destroyInputController()
             }
             self.createKeyboard = !self.createKeyboard
         }
@@ -48,7 +48,7 @@ class TestAppViewController: UIViewController, UITextViewDelegate {
         self.keyboardController = keyboard
         keyboard.view.translatesAutoresizingMaskIntoConstraints = false
         
-        view.backgroundColor = .systemGray5
+        view.backgroundColor = UIColor(named: "keyboardBackgroundColor")
         view.addSubview(keyboard.view)
         addChild(keyboard)
         

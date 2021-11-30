@@ -8,8 +8,24 @@
 import Foundation
 import UIKit
 
+extension CALayer {
+    static let disableAnimationActions: [String : CAAction] =  [
+        "backgroundColor": NSNull(),
+        "bounds": NSNull(),
+        "contents": NSNull(),
+        "fontSize": NSNull(),
+        "foregroundColor": NSNull(),
+        "hidden": NSNull(),
+        "onOrderIn": NSNull(),
+        "onOrderOut": NSNull(),
+        "position": NSNull(),
+        "string": NSNull(),
+        "sublayers": NSNull(),
+    ]
+}
+
 class StatusButton: UIButton {
-    private static let longPressDelay: Double = TouchHandler.keyRepeatInterval * Double(TouchHandler.keyRepeatInitialDelay)
+    private static let longPressDelay: Double = 0.3
     static let statusInset: CGFloat = 4, miniExpandImageInset: CGFloat = 7
     private static let miniExpandImageSizeRatio: CGFloat = 0.18, miniExpandImageAspectRatio: CGFloat = 1 / 2.3
     
@@ -18,6 +34,11 @@ class StatusButton: UIButton {
     
     private weak var statusSquareBg: CALayer?
     private weak var miniExpandImageLayer: CALayer?, miniExpandImageMaskLayer: CALayer?
+    
+    // Touch event near the screen edge are delayed.
+    // Overriding preferredScreenEdgesDeferringSystemGestures doesnt work in UIInputViewController,
+    // As a workaround we use UILongPressGestureRecognizer to detect taps without delays.
+    private weak var longPressGestureRecognizer: UILongPressGestureRecognizer!
     
     // Uncomment this to debug memory leak.
     private let c = InstanceCounter<StatusButton>()
@@ -40,12 +61,7 @@ class StatusButton: UIButton {
         super.init(frame: frame)
         
         let statusSquareBg = CALayer()
-        let newActions = [
-            "position": NSNull(),
-            "bounds": NSNull(),
-            "hidden": NSNull(),
-        ]
-        statusSquareBg.actions = newActions
+        statusSquareBg.actions = CALayer.disableAnimationActions
         statusSquareBg.frame = frame.insetBy(dx: Self.statusInset, dy: Self.statusInset)
         statusSquareBg.backgroundColor = ButtonColor.systemKeyBackgroundColor.resolvedColor(with: traitCollection).cgColor
         statusSquareBg.cornerRadius = 3
@@ -53,6 +69,13 @@ class StatusButton: UIButton {
         layer.addSublayer(statusSquareBg)
         
         self.statusSquareBg = statusSquareBg
+        
+        let longPressGestureRecognizer = BypassScreenEdgeTouchDelayGestureRecognizer(onTouchesBegan: { [weak self] touches, event in
+            guard let self = self else { return }
+            self.touchesBegan(touches, with: event)
+        })
+        addGestureRecognizer(longPressGestureRecognizer)
+        self.longPressGestureRecognizer = longPressGestureRecognizer
     }
     
     required init?(coder: NSCoder) {
@@ -93,8 +116,6 @@ class StatusButton: UIButton {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         
-        FeedbackProvider.rigidImpact.impactOccurred()
-        
         longPressTimer?.invalidate()
         longPressTimer = nil
         
@@ -119,7 +140,7 @@ class StatusButton: UIButton {
         
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
-        if bounds.contains(location) {
+        if bounds.contains(location) && !isMenuActive {
             super.touchesEnded(touches, with: event)
         } else {
             touchesCancelled(touches, with: event)
@@ -142,6 +163,7 @@ class StatusButton: UIButton {
             let miniExpandImageLayer = CALayer(), miniExpandImageMaskLayer = CALayer()
             miniExpandImageLayer.backgroundColor = ButtonColor.keyForegroundColor.resolvedColor(with: traitCollection).cgColor
             miniExpandImageLayer.mask = miniExpandImageMaskLayer
+            miniExpandImageLayer.actions = CALayer.disableAnimationActions
             
             miniExpandImageMaskLayer.contents = ButtonImage.paneExpandButtonImage.cgImage
             

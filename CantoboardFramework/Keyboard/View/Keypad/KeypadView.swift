@@ -45,7 +45,7 @@ class KeypadView: UIView, BaseKeyboardView {
     
     internal weak var statusMenu: StatusMenu?
     
-    private var touchHandler: TouchHandler!
+    private var touchHandler: TouchHandler?
     private var leftButtons: [[KeypadButton]] = []
     private var rightButtons: [[KeypadButton]] = []
     
@@ -68,7 +68,14 @@ class KeypadView: UIView, BaseKeyboardView {
         preservesSuperviewLayoutMargins = false
         
         initView()
-        touchHandler = TouchHandler(keyboardView: self, keyboardIdiom: state.keyboardIdiom)
+    }
+    
+    override func didMoveToSuperview() {
+        if superview == nil {
+            touchHandler = nil
+        } else {
+            touchHandler = TouchHandler(keyboardView: self, keyboardIdiom: state.keyboardIdiom)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -84,6 +91,8 @@ class KeypadView: UIView, BaseKeyboardView {
         let candidatePaneView = CandidatePaneView(keyboardState: state, candidateOrganizer: candidateOrganizer, layoutConstants: layoutConstants)
         candidatePaneView.delegate = self
         addSubview(candidatePaneView)
+        candidatePaneView.setupButtons()
+
         self.candidatePaneView = candidatePaneView
     }
     
@@ -105,15 +114,15 @@ class KeypadView: UIView, BaseKeyboardView {
     }
     
     private func setupButtons() {
-        let isFullShape = state.keyboardContextualType == .chinese
+        let isFullWidth = !state.keyboardContextualType.halfWidthSymbol
         for row in rightButtons {
             for button in row {
                 var props = button.props
                 switch props.keyCap.action {
-                case ",", "，": props.keyCap = isFullShape ? "，" : ","
-                case ".", "。": props.keyCap = isFullShape ? "。" : "."
-                case "?", "？": props.keyCap = isFullShape ? "？" : "?"
-                case "!", "！": props.keyCap = isFullShape ? "！" : "!"
+                case ",", "，": props.keyCap = isFullWidth ? "，" : ","
+                case ".", "。": props.keyCap = isFullWidth ? "。" : "."
+                case "?", "？": props.keyCap = isFullWidth ? "？" : "?"
+                case "!", "！": props.keyCap = isFullWidth ? "！" : "!"
                 default: ()
                 }
                 button.setKeyCap(props.keyCap, keyboardState: state)
@@ -123,6 +132,11 @@ class KeypadView: UIView, BaseKeyboardView {
     
     override func layoutSubviews() {
         guard let layoutConstants = layoutConstants?.ref else { return }
+        
+        directionalLayoutMargins = NSDirectionalEdgeInsets(top: layoutConstants.keyboardViewInsets.top,
+                                                           leading: layoutConstants.keyboardViewInsets.left,
+                                                           bottom: layoutConstants.keyboardViewInsets.bottom,
+                                                           trailing: layoutConstants.keyboardViewInsets.right)
         
         super.layoutSubviews()
         
@@ -160,6 +174,10 @@ class KeypadView: UIView, BaseKeyboardView {
     private func layoutCandidateSubviews(_ layoutConstants: LayoutConstants) {
         guard let candidatePaneView = candidatePaneView else { return }
         let height = candidatePaneView.mode == .row ? layoutConstants.autoCompleteBarHeight : bounds.height
+        candidatePaneView.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0,
+                                                                             leading: layoutConstants.keyboardViewInsets.left,
+                                                                             bottom: 0,
+                                                                             trailing: layoutConstants.keyboardViewInsets.right)
         candidatePaneView.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: bounds.width, height: height))
     }
     
@@ -226,7 +244,7 @@ extension KeypadView {
         guard let touch = touches.first,
               let keypadButton = touch.view as? KeypadButton else { return }
         
-        touchHandler.touchBegan(touch, key: keypadButton, with: event)
+        touchHandler?.touchBegan(touch, key: keypadButton, with: event)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -234,7 +252,7 @@ extension KeypadView {
         guard let touch = touches.first,
               let keypadButton = touch.view as? KeypadButton else { return }
         
-        touchHandler.touchMoved(touch, key: keypadButton, with: event)
+        touchHandler?.touchMoved(touch, key: keypadButton, with: event)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -242,13 +260,13 @@ extension KeypadView {
         guard let touch = touches.first,
               let keypadButton = touch.view as? KeypadButton else { return }
         
-        touchHandler.touchEnded(touch, key: keypadButton, with: event)
+        touchHandler?.touchEnded(touch, key: keypadButton, with: event)
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
         guard let touch = touches.first else { return }
         
-        touchHandler.touchCancelled(touch, with: event)
+        touchHandler?.touchCancelled(touch, with: event)
     }
 }

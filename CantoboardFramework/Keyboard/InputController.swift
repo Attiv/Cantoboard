@@ -16,12 +16,12 @@ enum KeyboardEnableState: Equatable {
 }
 
 enum ContextualType: Equatable {
-    case english, chinese, rime, url
+    case english, chinese, rime(halfWidthSymbol: Bool), url
     
-    var isEnglish: Bool {
+    var halfWidthSymbol: Bool {
         switch self {
-        case .english, .rime, .url: return true
-        default: return false
+        case .chinese, .rime(false): return false
+        default: return true
         }
     }
 }
@@ -58,7 +58,7 @@ struct KeyboardState: Equatable {
     }
     
     var symbolShape: SymbolShape {
-        symbolShapeOverride ?? (keyboardContextualType == .chinese ? .full : .half)
+        symbolShapeOverride ?? (!keyboardContextualType.halfWidthSymbol ? .full : .half)
     }
     
     init() {
@@ -83,6 +83,8 @@ struct KeyboardState: Equatable {
 
 class InputController: NSObject {
     var rimeInputEngine: RimeInputEngine?
+    private let c = InstanceCounter<InputController>()
+    
     private weak var keyboardViewController: KeyboardViewController?
     private weak var keyboardView: BaseKeyboardView?
     private(set) var inputEngine: BilingualInputEngine!
@@ -153,18 +155,24 @@ class InputController: NSObject {
         keyboardView.translatesAutoresizingMaskIntoConstraints = false
         keyboardViewPlaceholder.addSubview(keyboardView)
         
+        self.keyboardView = keyboardView
+    }
+    
+    deinit {
+        keyboardView?.removeConstraints(keyboardView?.constraints ?? [])
+        keyboardView?.removeFromSuperview()
+    }
+    
+    func createConstraints() {
+        guard let keyboardView = keyboardView,
+              let keyboardViewPlaceholder = keyboardViewController?.keyboardViewPlaceholder else { return }
+        
         NSLayoutConstraint.activate([
             keyboardView.leftAnchor.constraint(equalTo: keyboardViewPlaceholder.leftAnchor),
             keyboardView.rightAnchor.constraint(equalTo: keyboardViewPlaceholder.rightAnchor),
             keyboardView.topAnchor.constraint(equalTo: keyboardViewPlaceholder.topAnchor),
             keyboardView.bottomAnchor.constraint(equalTo: keyboardViewPlaceholder.bottomAnchor),
         ])
-        
-        self.keyboardView = keyboardView
-    }
-    
-    deinit {
-        keyboardView?.removeFromSuperview()
     }
     
     func textWillChange(_ textInput: UITextInput?) {
@@ -435,6 +443,10 @@ class InputController: NSObject {
                 return
             }
             
+            if (state.mainSchema == .stroke) {
+                clearInput()
+            }
+            
             state.inputMode = toInputMode
         case .toggleSymbolShape:
             switch state.symbolShape {
@@ -496,7 +508,7 @@ class InputController: NSObject {
         if Settings.cached.isMixedModeEnabled && state.inputMode == .chinese { state.inputMode = .mixed }
         if !Settings.cached.isMixedModeEnabled && state.inputMode == .mixed { state.inputMode = .chinese }
         
-        isImmediateMode =  Settings.cached.compositionMode == .immediate
+        isImmediateMode = state.inputMode == .english || Settings.cached.compositionMode == .immediate
         if isImmediateMode {
             if !(compositionRenderer is ImmediateModeCompositionRenderer) {
                 compositionRenderer = ImmediateModeCompositionRenderer(inputController: self)
@@ -639,6 +651,7 @@ class InputController: NSObject {
     }
     
     private func updateComposition() {
+        refreshInputSettings()
         switch state.inputMode {
         case .chinese: updateComposition(inputEngine.composition)
         case .english: updateComposition(inputEngine.englishComposition)
@@ -656,20 +669,18 @@ class InputController: NSObject {
         
         if state.activeSchema.isCangjieFamily {
             keyboardViewController?.compositionLabelView?.composition = inputEngine.rimeComposition
+        } else if state.inputMode == .english {
+            keyboardViewController?.compositionLabelView?.composition = inputEngine.englishComposition
         } else {
             keyboardViewController?.compositionLabelView?.composition = inputEngine.composition
         }
-        refreshInputSettings()
     }
     
     private func updateComposition(_ composition: Composition?) {
         guard let textDocumentProxy = textDocumentProxy else { return }
         
         guard var text = composition?.text, !text.isEmpty else {
-            if compositionRenderer.hasText {
-                compositionRenderer.update(withCaretAtTheEnd: "")
-                compositionRenderer.commit()
-            }
+            compositionRenderer.clear()
             return
         }
         var caretPosition = composition?.caretIndex ?? NSNotFound
@@ -744,12 +755,12 @@ class InputController: NSObject {
            (last2CharsInDoc.first ?? " ").couldBeFollowedBySmartSpace && last2CharsInDoc.last?.isWhitespace ?? false {
             // Translate double space tap into ". "
             textDocumentProxy.deleteBackward()
-            if state.keyboardContextualType == .chinese {
-                textDocumentProxy.insertText("。")
-                hasInsertedAutoSpace = false
-            } else {
+            if state.keyboardContextualType.halfWidthSymbol {
                 textDocumentProxy.insertText(". ")
                 hasInsertedAutoSpace = true
+            } else {
+                textDocumentProxy.insertText("。")
+                hasInsertedAutoSpace = false
             }
             return true
         }
@@ -813,27 +824,41 @@ class InputController: NSObject {
     
     private func refreshKeyboardContextualType() {
         guard let textDocumentProxy = textDocumentProxy else { return }
-        
+        let symbolShape = Settings.cached.symbolShape
+
         if textDocumentProxy.keyboardType == .some(.URL) || textDocumentProxy.keyboardType == .some(.webSearch) {
             state.keyboardContextualType = .url
         } else if inputEngine.composition?.text != nil {
-            state.keyboardContextualType = .rime
+            let halfWidthSymbol: Bool
+            switch symbolShape {
+            case .smart:
+                // The last character of the input buffer can't be a Chinese char.
+                // Show half width symbols in English and mixed mode.
+                halfWidthSymbol = state.keyboardContextualType != .chinese
+            case .half: halfWidthSymbol = true
+            case .full: halfWidthSymbol = false
+            }
+            state.keyboardContextualType = .rime(halfWidthSymbol: halfWidthSymbol)
         } else {
-            let symbolShape = Settings.cached.symbolShape
             if symbolShape == .smart {
-                // Default to English.
-                guard let lastChar = documentContextBeforeInput.last(where: { !$0.isWhitespace }) else {
-                    self.state.keyboardContextualType = .english
-                    return
-                }
-                // If the last char is Chinese, change contextual type to Chinese.
-                if lastChar.isChineseChar {
-                    self.state.keyboardContextualType = .chinese
-                } else {
-                    self.state.keyboardContextualType = .english
+                switch state.inputMode {
+                case .chinese: state.keyboardContextualType = .chinese
+                case .english where !Settings.cached.isMixedModeEnabled: state.keyboardContextualType = .english
+                default:
+                    // Default to English as inserting half width symbols between Chinese chars is more acceptable.
+                    guard let lastChar = documentContextBeforeInput.last(where: { !$0.isWhitespace }) else {
+                        state.keyboardContextualType = Settings.cached.smartSymbolShapeDefault == .full ? .chinese : .english
+                        return
+                    }
+                    // If the last char is Chinese, change contextual type to Chinese.
+                    if lastChar.isChineseChar {
+                        state.keyboardContextualType = .chinese
+                    } else {
+                        state.keyboardContextualType = .english
+                    }
                 }
             } else {
-                self.state.keyboardContextualType = symbolShape == .half ? .english : .chinese
+                state.keyboardContextualType = symbolShape == .half ? .english : .chinese
             }
         }
     }
