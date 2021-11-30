@@ -17,7 +17,7 @@ public enum RimeSchema: String, Codable {
     case cangjie = "cangjie5"
     case quick = "quick5"
 //    case mandarin = "luna_pinyin"
-    case mandarin = "xhup"
+    case mandarin = "openfly"
     case stroke = "stroke"
     case loengfan = "loengfan"
     
