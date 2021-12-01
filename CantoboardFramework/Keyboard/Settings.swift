@@ -199,6 +199,7 @@ public struct Settings: Codable, Equatable {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(settings) {
             userDefaults.set(encoded, forKey: settingsKeyName)
+            userDefaults.synchronize()
         } else {
             DDLogInfo("Failed to save \(settings)")
         }
@@ -209,7 +210,8 @@ public struct Settings: Codable, Equatable {
     private static var userDefaults: UserDefaults = initUserDefaults()
     
     private static func initUserDefaults() -> UserDefaults {
-        let suiteName = "group.org.cantoboard"
+//        let suiteName = "group.org.cantoboard"
+        let suiteName = "group.vitta.keyboard"
         let appGroupDefaults = UserDefaults(suiteName: suiteName)
         if let appGroupDefaults = appGroupDefaults {
             DDLogInfo("Using UserDefaults \(suiteName).")

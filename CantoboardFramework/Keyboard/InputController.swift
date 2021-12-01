@@ -235,15 +235,13 @@ class InputController: NSObject {
     
     private func handleSpace(spaceKeyMode: SpaceKeyMode) {
         guard let textDocumentProxy = textDocumentProxy else { return }
-        candidateSelected(choice: [0, 0], enableSmartSpace: true)
-        return
         let hasCandidate = inputEngine.isComposing && candidateOrganizer.getCandidateCount(section: 0) > 0
         switch spaceKeyMode {
         case .nextPage where hasCandidate:
             keyboardView?.scrollCandidatePaneToNextPageInRowMode()
             needReloadCandidates = false
-//        case .select where hasCandidate:
-//            candidateSelected(choice: [0, 0], enableSmartSpace: true)
+        case .select where hasCandidate:
+            candidateSelected(choice: [0, 0], enableSmartSpace: true)
         default:
             if !insertComposingText() {
                 if !handleAutoSpace() {
