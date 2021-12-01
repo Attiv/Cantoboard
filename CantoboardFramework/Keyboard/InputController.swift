@@ -648,7 +648,7 @@ class InputController: NSObject {
         DDLogInfo(isComposing)
         keyboardView?.state = state
         let text = rimeInputEngine!.getCommitedText()
-        if (text.count > 0) {
+        if (state.inputMode != .english && text.count > 0) {
             insertText(text)
         }
 //        DDLogInfo(text)
