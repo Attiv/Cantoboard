@@ -71,7 +71,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
     none,
     backspace,
     toggleInputMode(/* toMode */ InputMode, RimeSchema?),
-    character(String, String?, [KeyCap]?),
+    character(String, /* hint */ String?, /* children key caps */ [KeyCap]?),
     cangjie(String, Bool),
     stroke(String),
     emoji(String),
@@ -133,6 +133,13 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         }
     }
     
+    var character: Character? {
+        switch self {
+        case .character(let c, _, _): return c.first ?? nil
+        default: return nil
+        }
+    }
+        
     var buttonBgColor: UIColor {
         switch self {
         case .shift(.uppercased), .shift(.capsLocked): return ButtonColor.shiftKeyHighlightedBackgroundColor
@@ -449,6 +456,96 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case .placeholder(let keyCap): return keyCap.unescaped
         default: return self
         }
+    }
+    
+    private var toSpecialSymbol: SpecialSymbol? {
+        for specialSymbol in SpecialSymbol.allCases {
+            if specialSymbol.keyCaps.contains(self) {
+                return specialSymbol
+            }
+        }
+        return nil
+    }
+    
+    func symbolTransform(state: KeyboardState) -> KeyCap {
+        guard state.symbolShapeOverride == nil else { return self }
+        if let specialSymbol = self.toSpecialSymbol {
+            return specialSymbol.transform(keyCap: self, state: state)
+        }
+        return self
+    }
+}
+
+enum SpecialSymbol: CaseIterable {
+    case slash, parenthesis, curlyBracket, squareBracket, angleBracket, doubleAngleBracket
+    
+    var keyCapPairs: [(half: KeyCap, full: KeyCap)] {
+        switch self {
+        case .slash: return [(half: "/", full: "／")]
+        case .parenthesis: return [(half: "(", full: "（"), (half: ")", full: "）")]
+        case .curlyBracket: return [(half: "{", full: "｛"), (half: "}", full: "｝")]
+        case .squareBracket: return [(half: "[", full: "［"), (half: "]", full: "］")]
+        case .angleBracket: return [(half: "<", full: "〈"), (half: ">", full: "〉")]
+        case .doubleAngleBracket: return [(half: "«", full: "《"), (half: "»", full: "》")]
+        }
+    }
+    
+    var keyCaps: [KeyCap] {
+        return keyCapPairs.flatMap { return [$0.half, $0.full] }
+    }
+    
+    func transform(keyCap: KeyCap, state: KeyboardState) -> KeyCap {
+        let matchingKeyCap = keyCapPairs.first(where: { $0.half == keyCap || $0.full == keyCap })
+        guard let matchingKeyCap = matchingKeyCap else { return keyCap }
+        
+        let shapeOverride = state.specialSymbolShapeOverride[self]
+        
+        switch shapeOverride {
+        case .half: return matchingKeyCap.half
+        case .full: return matchingKeyCap.full
+        default: return keyCap
+        }
+    }
+    
+    func determineSymbolShape(textBefore: String) -> SymbolShape {
+        let symbolShape = Settings.cached.symbolShape
+        switch symbolShape {
+        case .smart:
+            switch self {
+            case .slash: return Self.determineSymbolShapeFromLastChar(textBefore: textBefore)
+            case .parenthesis, .curlyBracket, .squareBracket, .angleBracket, .doubleAngleBracket:
+                return determineSymbolShapeFromLastMatchingChar(textBefore: textBefore)
+            }
+        case .half: return .half
+        case .full: return .full
+        }
+    }
+    
+    private static func determineSymbolShapeFromLastChar(textBefore: String) -> SymbolShape {
+        for c in textBefore.reversed() {
+            if c.isEnglishLetterOrDigit {
+                return .half
+            } else if c.isChineseChar {
+                return .full
+            }
+        }
+        
+        return Settings.cached.smartSymbolShapeDefault
+    }
+    
+    private func determineSymbolShapeFromLastMatchingChar(textBefore: String) -> SymbolShape {
+        let halfChars = keyCapPairs.compactMap { $0.half.character }
+        let fullChars = keyCapPairs.compactMap { $0.full.character }
+        
+        for c in textBefore.reversed() {
+            if halfChars.contains(c) {
+                return .half
+            } else if fullChars.contains(c) {
+                return .full
+            }
+        }
+        
+        return Self.determineSymbolShapeFromLastChar(textBefore: textBefore)
     }
 }
 

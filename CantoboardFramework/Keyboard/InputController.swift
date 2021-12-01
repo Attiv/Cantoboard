@@ -15,12 +15,12 @@ enum KeyboardEnableState: Equatable {
     case enabled, disabled, loading
 }
 
-enum ContextualType: Equatable {
-    case english, chinese, rime(halfWidthSymbol: Bool), url
+indirect enum ContextualType: Equatable {
+    case english, chinese, rime(languageContext: ContextualType), url
     
     var halfWidthSymbol: Bool {
         switch self {
-        case .chinese, .rime(false): return false
+        case .chinese, .rime(.chinese): return false
         default: return true
         }
     }
@@ -38,6 +38,8 @@ struct KeyboardState: Equatable {
     var isComposing: Bool
     var keyboardContextualType: ContextualType
     var symbolShapeOverride: SymbolShape?
+    var specialSymbolShapeOverride: [SpecialSymbol: SymbolShape?]
+
     var isPortrait: Bool
     
     var enableState: KeyboardEnableState
@@ -66,6 +68,7 @@ struct KeyboardState: Equatable {
         lastKeyboardTypeChangeFromAutoCap = false
         isComposing = false
         keyboardContextualType = .english
+        specialSymbolShapeOverride = [:]
         let layoutConstants = LayoutConstants.forMainScreen
         keyboardIdiom = layoutConstants.idiom
         isPortrait = layoutConstants.isPortrait
@@ -156,6 +159,10 @@ class InputController: NSObject {
         keyboardViewPlaceholder.addSubview(keyboardView)
         
         self.keyboardView = keyboardView
+        
+        if keyboardViewPlaceholder.superview != nil {
+            createConstraints()
+        }
     }
     
     deinit {
@@ -829,38 +836,57 @@ class InputController: NSObject {
 
         if textDocumentProxy.keyboardType == .some(.URL) || textDocumentProxy.keyboardType == .some(.webSearch) {
             state.keyboardContextualType = .url
-        } else if inputEngine.composition?.text != nil {
-            let halfWidthSymbol: Bool
+        } else {
             switch symbolShape {
             case .smart:
-                // The last character of the input buffer can't be a Chinese char.
-                // Show half width symbols in English and mixed mode.
-                halfWidthSymbol = state.keyboardContextualType != .chinese
-            case .half: halfWidthSymbol = true
-            case .full: halfWidthSymbol = false
-            }
-            state.keyboardContextualType = .rime(halfWidthSymbol: halfWidthSymbol)
-        } else {
-            if symbolShape == .smart {
                 switch state.inputMode {
                 case .chinese: state.keyboardContextualType = .chinese
                 case .english where !Settings.cached.isMixedModeEnabled: state.keyboardContextualType = .english
                 default:
-                    // Default to English as inserting half width symbols between Chinese chars is more acceptable.
-                    guard let lastChar = documentContextBeforeInput.last(where: { !$0.isWhitespace }) else {
-                        state.keyboardContextualType = Settings.cached.smartSymbolShapeDefault == .full ? .chinese : .english
-                        return
-                    }
-                    // If the last char is Chinese, change contextual type to Chinese.
-                    if lastChar.isChineseChar {
-                        state.keyboardContextualType = .chinese
-                    } else {
-                        state.keyboardContextualType = .english
-                    }
+                    let isEnglish = isUserTypingEnglish(documentContextBeforeInput: documentContextBeforeInput)
+                    state.keyboardContextualType = isEnglish ? .english : .chinese
+                }
+            case .half: state.keyboardContextualType = .english
+            case .full: state.keyboardContextualType = .chinese
+            }
+            
+            for specialSymbol in SpecialSymbol.allCases {
+                let symbolShape = specialSymbol.determineSymbolShape(textBefore: documentContextBeforeInput)
+                state.specialSymbolShapeOverride[specialSymbol] = symbolShape
+            }
+        }
+        if inputEngine.isComposing {
+            state.keyboardContextualType = .rime(languageContext: state.keyboardContextualType)
+        }
+    }
+    
+    private func isUserTypingEnglish(documentContextBeforeInput: String) -> Bool {
+        var chineseCharCount = 0
+        var englishWordCount = 0
+        
+        let lastChar = documentContextBeforeInput.last
+        let text = (lastChar?.isTerminalPunctuation ?? false) ? documentContextBeforeInput.prefix(documentContextBeforeInput.count - 1) : documentContextBeforeInput[...]
+        let lastSentenseStartIndex = text.lastIndex(where: { $0.isTerminalPunctuation }) ?? documentContextBeforeInput.startIndex
+        let lastSentense = documentContextBeforeInput.suffix(from: lastSentenseStartIndex)
+        var hasStartedEnglishWord = false
+        for c in lastSentense {
+            chineseCharCount += c.isChineseChar ? 1 : 0
+            if c.isEnglishLetter {
+                if !hasStartedEnglishWord {
+                    hasStartedEnglishWord = true
+                    englishWordCount += 1
                 }
             } else {
-                state.keyboardContextualType = symbolShape == .half ? .english : .chinese
+                hasStartedEnglishWord = false
             }
+        }
+        
+        if chineseCharCount > englishWordCount {
+            return false
+        } else if chineseCharCount < englishWordCount {
+            return true
+        } else {
+            return Settings.cached.smartSymbolShapeDefault != .full
         }
     }
     
