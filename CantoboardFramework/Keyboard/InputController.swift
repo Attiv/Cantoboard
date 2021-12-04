@@ -650,6 +650,7 @@ class InputController: NSObject {
         let text = rimeInputEngine!.getCommitedText()
         if (state.inputMode != .english && text.count > 0) {
             insertText(text)
+            clearInput()
         }
 //        DDLogInfo(text)
         
