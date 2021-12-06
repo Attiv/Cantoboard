@@ -1,3 +1,4 @@
 # encoding: utf-8
+# 开启关闭逐码
 patch:
   translator/enable_completion: true
