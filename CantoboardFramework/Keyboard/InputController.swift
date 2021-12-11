@@ -242,6 +242,10 @@ class InputController: NSObject {
             needReloadCandidates = false
         case .select where hasCandidate:
             candidateSelected(choice: [0, 0], enableSmartSpace: true)
+        case .fullWidthSpace:
+            if !insertComposingText(appendBy: "　", shouldDisableSmartSpace: true) {
+                insertText("　")
+            }
         default:
             if !insertComposingText() {
                 if !handleAutoSpace() {
@@ -421,11 +425,13 @@ class InputController: NSObject {
             isHoldingShift = true
             state.keyboardType = .alphabetic(.uppercased)
             state.lastKeyboardTypeChangeFromAutoCap = false
+            updateSpaceState()
             return
         case .shiftUp:
             state.keyboardType = .alphabetic(.lowercased)
             state.lastKeyboardTypeChangeFromAutoCap = false
             isHoldingShift = false
+            updateSpaceState()
             return
         case .shiftRelax:
             isHoldingShift = false
@@ -433,7 +439,8 @@ class InputController: NSObject {
         case .keyboardType(let type):
             state.keyboardType = type
             state.lastKeyboardTypeChangeFromAutoCap = false
-            self.checkAutoCap()
+            checkAutoCap()
+            updateSpaceState()
             return
         case .setCharForm(let cs):
             inputEngine.charForm = cs
@@ -645,7 +652,9 @@ class InputController: NSObject {
             }
         }
         state.isComposing = isComposing
-        DDLogInfo(isComposing)
+        
+        updateSpaceState()
+        
         keyboardView?.state = state
         let text = rimeInputEngine!.getCommitedText()
         if (state.inputMode != .english && text.count > 0) {
@@ -655,6 +664,25 @@ class InputController: NSObject {
 //        DDLogInfo(text)
         
         
+    }
+    
+    private func updateSpaceState() {
+        guard state.spaceKeyMode.isSpace else { return }
+        
+        guard state.inputMode != .english else {
+            state.spaceKeyMode = .space
+            return
+        }
+
+        let fullWidthSpaceMode = Settings.cached.fullWidthSpaceMode
+        var isFullWidth: Bool
+        switch fullWidthSpaceMode {
+        case .off: isFullWidth = false
+        case .shift:
+            isFullWidth = state.keyboardType == .alphabetic(.uppercased) && !state.lastKeyboardTypeChangeFromAutoCap
+        }
+        
+        state.spaceKeyMode = isFullWidth ? .fullWidthSpace : .space
     }
     
     private func updateComposition() {
@@ -674,7 +702,7 @@ class InputController: NSObject {
             }
         }
         
-        if state.activeSchema.isCangjieFamily {
+        if state.activeSchema.isCangjieFamily && state.inputMode != .english {
             keyboardViewController?.compositionLabelView?.composition = inputEngine.rimeComposition
         } else if state.inputMode == .english {
             keyboardViewController?.compositionLabelView?.composition = inputEngine.englishComposition
@@ -705,7 +733,9 @@ class InputController: NSObject {
     
     private var shouldEnableSmartInput: Bool {
         guard let textFieldType = textDocumentProxy?.keyboardType else { return true }
-        return textFieldType != .URL &&
+        let isSmartEnglishSpaceEnabled = Settings.cached.isSmartEnglishSpaceEnabled || state.inputMode == .english
+        return isSmartEnglishSpaceEnabled &&
+            textFieldType != .URL &&
             textFieldType != .asciiCapableNumberPad &&
             textFieldType != .decimalPad &&
             textFieldType != .emailAddress &&

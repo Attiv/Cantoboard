@@ -12,6 +12,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
     @IBOutlet weak private var enableMixedModeControl: UISwitch!
     @IBOutlet weak private var autoCapControl: UISwitch!
     @IBOutlet weak private var smartFullStopControl: UISwitch!
+    @IBOutlet weak private var smartEnglishSpaceControl: UISwitch!
     @IBOutlet weak private var symbolShapeControl: UISegmentedControl!
     @IBOutlet weak private var smartSymbolShapeDefaultControl: UISegmentedControl!
     @IBOutlet weak private var candidateFontSizeControl: UISegmentedControl!
@@ -27,6 +28,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
     @IBOutlet weak private var compositionModeControl: UISegmentedControl!
     @IBOutlet weak private var enableNumKeyRowControl: UISwitch!
     @IBOutlet weak private var enableHKCorrectionControl: UISwitch!
+    @IBOutlet weak private var fullWidthSpaceControl: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +40,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
         smartFullStopControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         symbolShapeControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         smartSymbolShapeDefaultControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
+        smartEnglishSpaceControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         candidateFontSizeControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         spaceActionControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         toneInputControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
@@ -50,6 +53,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
         compositionModeControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         enableNumKeyRowControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
         enableHKCorrectionControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
+        fullWidthSpaceControl.addTarget(self, action: #selector(updateSettings), for: .valueChanged)
 
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willEnterForegroundNotification, object: nil)
@@ -118,6 +122,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
         var settings = Settings()
         settings.isMixedModeEnabled = enableMixedModeControl.isOn
         settings.isAutoCapEnabled = autoCapControl.isOn
+        settings.isSmartEnglishSpaceEnabled = smartEnglishSpaceControl.isOn
         settings.isSmartFullStopEnabled = smartFullStopControl.isOn
         settings.symbolShape = selectedSymbolShape
         settings.smartSymbolShapeDefault = smartSymbolShapeDefault
@@ -133,6 +138,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
         settings.compositionMode = compositionMode
         settings.enableNumKeyRow = enableNumKeyRowControl.isOn
         settings.enableHKCorrection = enableHKCorrectionControl.isOn
+        settings.fullWidthSpaceMode = fullWidthSpaceControl.isOn ? .shift : .off
         Settings.save(settings)
     }
     
@@ -196,6 +202,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
     private func populateSmartInputSettings(_ settings: Settings) {
         enableMixedModeControl.isOn = settings.isMixedModeEnabled
         autoCapControl.isOn = settings.isAutoCapEnabled
+        smartEnglishSpaceControl.isOn = settings.isSmartEnglishSpaceEnabled
         smartFullStopControl.isOn = settings.isSmartFullStopEnabled
         audioFeedbackControl.isOn = settings.isAudioFeedbackEnabled
         hapticFeedbackControl.isOn = settings.isTapHapticFeedbackEnabled
@@ -203,6 +210,7 @@ class SettingViewController: UITableViewController, UIGestureRecognizerDelegate 
         showEnglishExactMatchControl.isOn = settings.shouldShowEnglishExactMatch
         enableNumKeyRowControl.isOn = settings.enableNumKeyRow
         enableHKCorrectionControl.isOn = settings.enableHKCorrection
+        fullWidthSpaceControl.isOn = settings.fullWidthSpaceMode == .shift
         
         populateSetting(toSegmentedControl: englishLocaleInputControl, settingToIndexMapper: {
             switch $0.englishLocale {

@@ -70,6 +70,11 @@ public enum ShowRomanizationMode: String, Codable {
     case never = "never"
 }
 
+public enum FullWidthSpaceMode: String, Codable {
+    case off = "off"
+    case shift = "shift"
+}
+
 // If any of these settings is changed, we have to redeploy Rime.
 public struct RimeSettings: Codable, Equatable {
     public var enableCorrector: Bool
@@ -88,6 +93,7 @@ public struct Settings: Codable, Equatable {
     private static let settingsKeyName = "Settings"
     private static let defaultMixedModeEnabled: Bool = true
     private static let defaultAutoCapEnabled: Bool = true
+    private static let defaultSmartEnglishSpaceEnabled: Bool = true
     private static let defaultSmartFullStopEnabled: Bool = true
     private static let defaultCandidateFontSize: CandidateFontSize = .normal
     private static let defaultSymbolShape: SymbolShape = .smart
@@ -103,9 +109,11 @@ public struct Settings: Codable, Equatable {
     private static let defaultCompositionMode: CompositionMode = .multiStage
     private static let defaultEnableNumKeyRow: Bool = false
     private static let defaultEnableHKCorrection: Bool = true
+    private static let defaultFullWidthSpaceMode: FullWidthSpaceMode = .off
 
     public var isMixedModeEnabled: Bool
     public var isAutoCapEnabled: Bool
+    public var isSmartEnglishSpaceEnabled: Bool = true
     public var isSmartFullStopEnabled: Bool
     public var candidateFontSize: CandidateFontSize
     public var symbolShape: SymbolShape
@@ -121,10 +129,12 @@ public struct Settings: Codable, Equatable {
     public var compositionMode: CompositionMode
     public var enableNumKeyRow: Bool
     public var enableHKCorrection: Bool
+    public var fullWidthSpaceMode: FullWidthSpaceMode
     
     public init() {
         isMixedModeEnabled = Self.defaultMixedModeEnabled
         isAutoCapEnabled = Self.defaultAutoCapEnabled
+        isSmartEnglishSpaceEnabled = Self.defaultSmartEnglishSpaceEnabled
         isSmartFullStopEnabled = Self.defaultSmartFullStopEnabled
         candidateFontSize = Self.defaultCandidateFontSize
         symbolShape = Self.defaultSymbolShape
@@ -140,6 +150,7 @@ public struct Settings: Codable, Equatable {
         compositionMode = Self.defaultCompositionMode
         enableNumKeyRow = Self.defaultEnableNumKeyRow
         enableHKCorrection = Self.defaultEnableHKCorrection
+        fullWidthSpaceMode = Self.defaultFullWidthSpaceMode
     }
     
     public init(from decoder: Decoder) throws {
@@ -147,6 +158,7 @@ public struct Settings: Codable, Equatable {
         self.isMixedModeEnabled = try container.decodeIfPresent(Bool.self, forKey: .isMixedModeEnabled) ?? Settings.defaultMixedModeEnabled
         self.isAutoCapEnabled = try container.decodeIfPresent(Bool.self, forKey: .isAutoCapEnabled) ?? Settings.defaultAutoCapEnabled
         self.isSmartFullStopEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSmartFullStopEnabled) ?? Settings.defaultSmartFullStopEnabled
+        self.isSmartEnglishSpaceEnabled = try container.decodeIfPresent(Bool.self, forKey: .isSmartEnglishSpaceEnabled) ?? Settings.defaultSmartEnglishSpaceEnabled
         self.candidateFontSize = try container.decodeIfPresent(CandidateFontSize.self, forKey: .candidateFontSize) ?? Settings.defaultCandidateFontSize
         self.symbolShape = try container.decodeIfPresent(SymbolShape.self, forKey: .symbolShape) ?? Settings.defaultSymbolShape
         self.smartSymbolShapeDefault = try container.decodeIfPresent(SymbolShape.self, forKey: .smartSymbolShapeDefault) ?? Settings.defaultSmartSymbolShapeDefault
@@ -161,6 +173,7 @@ public struct Settings: Codable, Equatable {
         self.compositionMode = try container.decodeIfPresent(CompositionMode.self, forKey: .compositionMode) ?? Settings.defaultCompositionMode
         self.enableNumKeyRow = try container.decodeIfPresent(Bool.self, forKey: .enableNumKeyRow) ?? Settings.defaultEnableNumKeyRow
         self.enableHKCorrection = try container.decodeIfPresent(Bool.self, forKey: .enableHKCorrection) ?? Settings.defaultEnableHKCorrection
+        self.fullWidthSpaceMode = try container.decodeIfPresent(FullWidthSpaceMode.self, forKey: .fullWidthSpaceMode) ?? Settings.defaultFullWidthSpaceMode
     }
     
     private static var _cached: Settings?
