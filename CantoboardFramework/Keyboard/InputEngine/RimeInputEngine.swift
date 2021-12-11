@@ -12,12 +12,13 @@ import CocoaLumberjackSwift
 
 public enum RimeSchema: String, Codable {
 //    case jyutping = "xhup"
-    case jyutping = "jyut6ping3"
+//    case jyutping = "jyut6ping3"
+    case jyutping = "openfly"
     case yale = "yale"
     case cangjie = "cangjie5"
     case quick = "quick5"
-//    case mandarin = "luna_pinyin"
-    case mandarin = "openfly"
+    case mandarin = "luna_pinyin"
+//    case mandarin = "openfly"
     case stroke = "stroke"
     case loengfan = "loengfan"
     
@@ -26,9 +27,11 @@ public enum RimeSchema: String, Codable {
         case .cangjie: return "倉"
         case .yale: return "耶"
         case .quick: return "速"
-        case .jyutping: return "粵"
+//        case .jyutping: return "粵"
+        case .jyutping: return "音"
         case .loengfan: return "兩"
-        case .mandarin: return "音"
+//        case .mandarin: return "音"
+        case .mandarin: return "拼"
         case .stroke: return "筆"
         }
     }
@@ -38,9 +41,10 @@ public enum RimeSchema: String, Codable {
         case .cangjie: return "倉頡"
         case .yale: return "耶魯"
         case .quick: return "速成"
-        case .jyutping: return "粵拼"
+//        case .jyutping: return "粵拼"
+        case .jyutping: return "音形"
         case .loengfan: return "兩分"
-        case .mandarin: return "音形"
+        case .mandarin: return "拼音"
         case .stroke: return "筆劃"
         }
     }
