@@ -14,7 +14,8 @@ public enum RimeSchema: String, Codable {
 //    case jyutping = "xhup"
 //    case jyutping = "jyut6ping3"
     case jyutping = "openfly"
-    case yale = "yale"
+//    case yale = "yale"
+    case yale = "wubi86_jidian"
     case cangjie = "cangjie5"
     case quick = "quick5"
     case mandarin = "luna_pinyin"
@@ -25,7 +26,8 @@ public enum RimeSchema: String, Codable {
     var signChar: String {
         switch self {
         case .cangjie: return "倉"
-        case .yale: return "耶"
+//        case .yale: return "耶"
+        case .yale: return "五"
         case .quick: return "速"
 //        case .jyutping: return "粵"
         case .jyutping: return "音"
@@ -39,7 +41,8 @@ public enum RimeSchema: String, Codable {
     var shortName: String {
         switch self {
         case .cangjie: return "倉頡"
-        case .yale: return "耶魯"
+//        case .yale: return "耶魯"
+        case .yale: return "五笔"
         case .quick: return "速成"
 //        case .jyutping: return "粵拼"
         case .jyutping: return "音形"

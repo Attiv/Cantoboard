@@ -4,3 +4,8 @@ patch:
   - schema: xhup
   - schema: xhup_express
   - schema: double_pinyin_flypy
+  - schema: wubi86_jidian
+  - schema: numbers
+  - schema: wubi86_jidian_pinyin
+  - schema: wubi86_jidian_trad
+  - schema: wubi86_jidian_trad_pinyin
