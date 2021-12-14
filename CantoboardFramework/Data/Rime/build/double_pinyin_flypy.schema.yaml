@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1630761904
-    default.custom: 1626429700
+    default: 1639498879
+    default.custom: 1639498879
     double_pinyin_flypy.custom: 0
-    double_pinyin_flypy.schema: 1626429700
+    double_pinyin_flypy.schema: 1639498879
 engine:
   filters:
     - simplifier
@@ -38,15 +38,13 @@ key_binder:
     - {accept: "Control+e", send: End, when: composing}
     - {accept: "Control+d", send: Delete, when: composing}
     - {accept: "Control+k", send: "Shift+Delete", when: composing}
-    - {accept: "Control+h", send: BackSpace, when: composing}
     - {accept: "Control+g", send: Escape, when: composing}
-    - {accept: "Control+bracketleft", send: Escape, when: composing}
     - {accept: "Alt+v", send: Page_Up, when: composing}
     - {accept: "Control+v", send: Page_Down, when: composing}
-    - {accept: ISO_Left_Tab, send: Page_Up, when: composing}
-    - {accept: "Shift+Tab", send: Page_Up, when: composing}
-    - {accept: Tab, send: Page_Down, when: composing}
-    - {accept: minus, send: Page_Up, when: has_menu}
+    - {accept: ISO_Left_Tab, send: "Shift+Left", when: composing}
+    - {accept: "Shift+Tab", send: "Shift+Left", when: composing}
+    - {accept: Tab, send: "Shift+Right", when: composing}
+    - {accept: minus, send: Page_Up, when: paging}
     - {accept: equal, send: Page_Down, when: has_menu}
     - {accept: comma, send: Page_Up, when: paging}
     - {accept: period, send: Page_Down, when: has_menu}
@@ -55,11 +53,6 @@ key_binder:
     - {accept: "Control+Shift+3", toggle: full_shape, when: always}
     - {accept: "Control+Shift+4", toggle: simplification, when: always}
     - {accept: "Control+Shift+5", toggle: extended_charset, when: always}
-    - {accept: "Control+Shift+exclam", select: .next, when: always}
-    - {accept: "Control+Shift+at", toggle: ascii_mode, when: always}
-    - {accept: "Control+Shift+numbersign", toggle: full_shape, when: always}
-    - {accept: "Control+Shift+dollar", toggle: simplification, when: always}
-    - {accept: "Control+Shift+percent", toggle: extended_charset, when: always}
     - {accept: "Shift+space", toggle: full_shape, when: always}
     - {accept: "Control+period", toggle: ascii_punct, when: always}
   import_preset: default
@@ -77,7 +70,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["＊", "·", "・", "×", "※", "❂"]
+    "*": ["＊", "・", "·", "×", "※", "❂"]
     "+": "＋"
     ",": {commit: "，"}
     "-": "－"
@@ -97,9 +90,9 @@ punctuator:
     _: "——"
     "`": "｀"
     "{": ["『", "〖", "｛"]
-    "|": ["·", "｜", "§", "¦"]
+    "|": ["・", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": "～"
+    "~": ["〜", "～", "〰"]
   half_shape:
     "!": {commit: "！"}
     "\"": {pair: ["“", "”"]}
@@ -110,7 +103,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["*", "＊", "·", "・", "×", "※", "❂"]
+    "*": ["*", "＊", "・", "·", "×", "※", "❂"]
     "+": "+"
     ",": {commit: "，"}
     "-": "-"
@@ -130,17 +123,17 @@ punctuator:
     _: "——"
     "`": "`"
     "{": ["『", "〖", "｛"]
-    "|": ["·", "|", "｜", "§", "¦"]
+    "|": ["・", "|", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": ["~", "～"]
+    "~": ["~", "〜", "～", "〰"]
   import_preset: default
 recognizer:
   import_preset: default
   patterns:
-    email: "^[A-Za-z][-_.0-9A-Za-z]*@.*$"
+    email: "^[a-z][-_.0-9a-z]*@.*$"
     reverse_lookup: "`[a-z]*'?$"
     uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
-    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
+    url: "^(www[.]|https?:|ftp:|mailto:).*$|^[a-z]+[.].+$"
 reverse_lookup:
   comment_format:
     - "xform/([nl])v/$1ü/"
@@ -159,7 +152,7 @@ schema:
     - stroke
   description: |
     朙月拼音＋小鶴雙拼方案。
-
+    
   name: "小鶴雙拼"
   schema_id: double_pinyin_flypy
   version: 0.18
