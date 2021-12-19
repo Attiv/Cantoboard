@@ -354,7 +354,12 @@ class InputController: NSObject {
                 // This shouldn't have any side effects in other apps.
                 textDocumentProxy.insertText("")
             }
-            let shouldFeedCharToInputEngine = char.isEnglishLetter && c.count == 1
+            var shouldFeedCharToInputEngine = false
+            if (inputEngine.rimeSchema.isVitta) {
+                shouldFeedCharToInputEngine = (char == "`") || (char.isEnglishLetter && c.count == 1)
+            } else {
+                shouldFeedCharToInputEngine = char.isEnglishLetter && c.count == 1
+            }
             if !(shouldFeedCharToInputEngine && inputEngine.processChar(char)) {
                 if !insertComposingText(appendBy: c) {
                     insertText(c)
@@ -366,7 +371,11 @@ class InputController: NSObject {
             }
         case .rime(let rc):
             guard isComposing || rc == .sym else { return }
-            _ = inputEngine.processRimeChar(rc.rawValue)
+            if (inputEngine.rimeSchema.isVitta && rc == .delimiter) {
+                candidateSelected(choice: [0, 1], enableSmartSpace: true)
+            } else {
+                _ = inputEngine.processRimeChar(rc.rawValue)
+            }
         case .space(let spaceKeyMode):
             handleSpace(spaceKeyMode: spaceKeyMode)
         case .quote(let isDoubleQuote):
