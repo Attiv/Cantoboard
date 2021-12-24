@@ -936,6 +936,7 @@ class InputController: NSObject {
         
         defer {
             candidateOrganizer.autoSuggestionType = newAutoSuggestionType
+            candidateOrganizer.suggestionContextualText = textBeforeInput
         }
         
         guard let lastCharBefore = textBeforeInput.last else {
