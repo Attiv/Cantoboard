@@ -1,12 +1,12 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1639498879
-    default.custom: 1639498879
-    symbols: 1639498879
+    default: 1641140856
+    default.custom: 1641140856
+    symbols: 1641140856
     symbols.custom: 0
     xhup_express.custom: 0
-    xhup_express.schema: 1639498879
+    xhup_express.schema: 1641140856
 engine:
   filters:
     - simplifier

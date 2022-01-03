@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1639498879
-    default.custom: 1639498879
+    default: 1641140856
+    default.custom: 1641140856
     wubi86_jidian.custom: 0
-    wubi86_jidian.schema: 1639498879
+    wubi86_jidian.schema: 1641140856
 engine:
   filters:
     - "simplifier@tradition"

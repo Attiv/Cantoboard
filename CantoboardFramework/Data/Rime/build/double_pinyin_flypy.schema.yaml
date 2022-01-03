@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1639498879
-    default.custom: 1639498879
+    default: 1641140856
+    default.custom: 1641140856
     double_pinyin_flypy.custom: 0
-    double_pinyin_flypy.schema: 1639498879
+    double_pinyin_flypy.schema: 1641140856
 engine:
   filters:
     - simplifier
