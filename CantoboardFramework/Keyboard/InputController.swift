@@ -872,8 +872,9 @@ class InputController: NSObject {
         guard let textDocumentProxy = textDocumentProxy else { return }
         let symbolShape = Settings.cached.symbolShape
 
-        if textDocumentProxy.keyboardType == .some(.URL) || textDocumentProxy.keyboardType == .some(.webSearch) {
+        if textDocumentProxy.keyboardType == .URL || textDocumentProxy.keyboardType == .webSearch {
             state.keyboardContextualType = .url
+            return
         } else {
             switch symbolShape {
             case .smart:
@@ -956,9 +957,8 @@ class InputController: NSObject {
         switch state.keyboardContextualType {
         case .english where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
             newAutoSuggestionType = .halfWidthPunctuation
-        case .chinese where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
+        case .chinese where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty, .url:
             newAutoSuggestionType = .fullWidthPunctuation
-        case .url: ()
         default:
             if lastCharBefore.isNumber {
                 if lastCharBefore.isASCII && !Settings.cached.enableNumKeyRow {
