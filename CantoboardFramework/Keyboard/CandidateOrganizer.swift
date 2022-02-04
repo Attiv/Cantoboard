@@ -459,11 +459,12 @@ extension PredictiveTextEngine {
         return PredictiveTextEngine(dictsPath + ngramFileName)
     }
     
-    private static let hk = initPredictiveTextEngine(charForm: .traditional)
+//    private static let hk = initPredictiveTextEngine(charForm: .traditional)
     private static let cn = initPredictiveTextEngine(charForm: .simplified)
     
     public static func getPredictiveTextEngine(charForm: CharForm) -> PredictiveTextEngine {
-        return charForm == .traditional ? .hk : .cn
+        return charForm == .traditional ? .cn : .cn
+        
     }
 }
 
