@@ -340,10 +340,10 @@ class LayoutConstants: Copyable {
     let candidatePaneViewLeftRightInset: CGFloat
     let compositionViewHeight: CGFloat
     
-    var numOfSingleCharCandidateInRow: Int {
+    var numOfSingleCharCandidateInRow: Double {
         switch idiom {
         case .phone:
-            return isPortrait ? 8 : 15
+            return isPortrait ? 7.75 : 15
         case .pad:
             return isPortrait ? 15 : 20
         }
@@ -905,8 +905,17 @@ extension LayoutConstants {
         case .keyboardType(.emojis): return 18
         case .rime, .keyboardType, .returnKey, .space, "^_^", "\t", ".com", .toggleInputMode, .shift, .nextKeyboard, .dismissKeyboard, .backspace: return 16
         case .cangjie(_, true): return 20
-        case .character(let c, _, _) where c.first?.isEnglishLetter ?? false: return c.first!.isUppercase ? 22 : 23
-        default: return idiom == .phone ? 22 : 24
+        case .currency where idiom.isPad: return 20
+        case .character(let c, _, _), .contextual(.character(let c)):
+            if c.first?.isEnglishLetter ?? false { return c.first!.isUppercase ? 22 : 23 }
+            
+            if idiom == .pad(.padFull5Rows) && "[]/\\".contains(c) {
+                return 19
+            } else if idiom.isPad && idiom != .pad(.padFull5Rows) && "@#/()（）「」’%-~…､;:／—～⋯、；：，。".contains(c) {
+                return 20
+            }
+        default: ()
         }
+        return idiom == .phone ? 22 : 24
     }
 }

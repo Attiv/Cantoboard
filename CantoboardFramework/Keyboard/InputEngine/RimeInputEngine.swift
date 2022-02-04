@@ -113,7 +113,6 @@ class RimeInputEngine: NSObject, InputEngine {
     init(schema: RimeSchema) {
         _schema = schema
         super.init()
-        tryCreateRimeSessionIfNeeded()
     }
     
     deinit {
@@ -269,9 +268,9 @@ class RimeInputEngine: NSObject, InputEngine {
         return charIndex
     }
     
-    private func tryCreateRimeSessionIfNeeded() {
+    func tryCreateRimeSessionIfNeeded() {
         if rimeSession == nil && RimeApi.shared.state == .succeeded {
-            createRimeSession()
+            self.createRimeSession()
         } else {
             RimeApi.stateChangeCallbacks.append({ [weak self] rimeApi, newState in
                 guard let self = self, self.rimeSession == nil else { return true }

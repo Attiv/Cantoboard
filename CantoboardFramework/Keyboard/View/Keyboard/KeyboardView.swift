@@ -23,7 +23,11 @@ class KeyboardView: UIView, BaseKeyboardView {
         set { changeState(prevState: _state, newState: newValue) }
     }
     
-    private var candidateOrganizer: CandidateOrganizer
+    public var candidateOrganizer: CandidateOrganizer? {
+        didSet {
+            candidatePaneView?.candidateOrganizer = candidateOrganizer
+        }
+    }
     
     internal weak var statusMenu: StatusMenu?
     private weak var candidatePaneView: CandidatePaneView?
@@ -36,7 +40,7 @@ class KeyboardView: UIView, BaseKeyboardView {
     // As a workaround we use UILongPressGestureRecognizer to detect taps without delays.
     private weak var longPressGestureRecognizer: UILongPressGestureRecognizer!
     
-    internal weak var layoutConstants: Reference<LayoutConstants>?
+    public var layoutConstants: Reference<LayoutConstants> = Reference(LayoutConstants.forMainScreen)
     private weak var newLineKey: KeyView?
     private weak var spaceKey: KeyView?
     private weak var loadingIndicatorView: UIActivityIndicatorView?
@@ -50,10 +54,8 @@ class KeyboardView: UIView, BaseKeyboardView {
         self.loadingIndicatorView = loadingIndicatorView
     }
     
-    init(state: KeyboardState, candidateOrganizer: CandidateOrganizer, layoutConstants: Reference<LayoutConstants>) {
+    init(state: KeyboardState) {
         self._state = state
-        self.candidateOrganizer = candidateOrganizer
-        self.layoutConstants = layoutConstants
         self.keyRows = []
         super.init(frame: .zero)
         
@@ -103,7 +105,8 @@ class KeyboardView: UIView, BaseKeyboardView {
             prevState.lastKeyboardTypeChangeFromAutoCap != newState.lastKeyboardTypeChangeFromAutoCap ||
             prevState.isComposing != newState.isComposing ||
             prevState.isPortrait != newState.isPortrait ||
-            prevState.specialSymbolShapeOverride != newState.specialSymbolShapeOverride
+            prevState.specialSymbolShapeOverride != newState.specialSymbolShapeOverride ||
+            prevState.isKeyboardAppearing != newState.isKeyboardAppearing
         
         if prevState.needsInputModeSwitchKey != newState.needsInputModeSwitchKey {
             keyRows.forEach { $0.needsInputModeSwitchKey = newState.needsInputModeSwitchKey }
@@ -140,8 +143,7 @@ class KeyboardView: UIView, BaseKeyboardView {
         super.layoutSubviews()
         
         // DDLogInfo("layoutSubviews screen size \(UIScreen.main.bounds.size)")
-        guard let layoutConstants = self.layoutConstants?.ref else { return }
-        
+        let layoutConstants = layoutConstants.ref
         layoutKeyboardSubviews(layoutConstants)
         layoutCandidateSubviews(layoutConstants)
         layoutLoadingIndicatorView()
@@ -223,7 +225,7 @@ class KeyboardView: UIView, BaseKeyboardView {
     }
     
     private func refreshKeys() {
-        guard let layoutConstants = self.layoutConstants?.ref else { return }
+        let layoutConstants = self.layoutConstants.ref
         
         let keyboardViewLayout = layoutConstants.idiom.keyboardViewLayout
         
@@ -376,7 +378,6 @@ class KeyboardView: UIView, BaseKeyboardView {
     }
     
     private func createKeyRows() {
-        guard let layoutConstants = layoutConstants else { return }
         let numOfKeyRows = layoutConstants.ref.idiom.keyboardViewLayout.numOfRows
         
         while keyRows.count < numOfKeyRows {
@@ -399,9 +400,10 @@ class KeyboardView: UIView, BaseKeyboardView {
     }
     
     private func createCandidatePaneView() {
-        guard candidatePaneView == nil, let layoutConstants = layoutConstants else { return }
+        guard candidatePaneView == nil else { return }
         
-        let candidatePaneView = CandidatePaneView(keyboardState: state, candidateOrganizer: candidateOrganizer, layoutConstants: layoutConstants)
+        let candidatePaneView = CandidatePaneView(keyboardState: state, layoutConstants: layoutConstants)
+        candidatePaneView.candidateOrganizer = candidateOrganizer
         candidatePaneView.delegate = self        
         addSubview(candidatePaneView)        
         sendSubviewToBack(candidatePaneView)
@@ -482,11 +484,11 @@ extension KeyboardView: CandidatePaneViewDelegate, StatusMenuHandler {
     }
     
     var statusMenuOriginY: CGFloat {
-        layoutConstants?.ref.autoCompleteBarHeight ?? .zero
+        layoutConstants.ref.autoCompleteBarHeight
     }
     
     var keyboardSize: CGSize {
-        layoutConstants?.ref.keyboardSize ?? .zero
+        layoutConstants.ref.keyboardSize
     }
 }
 

@@ -41,7 +41,7 @@ class KeypadView: UIView, BaseKeyboardView {
     ]
     
     private weak var candidatePaneView: CandidatePaneView?
-    internal weak var layoutConstants: Reference<LayoutConstants>?
+    public var layoutConstants: Reference<LayoutConstants> = Reference(LayoutConstants.forMainScreen)
     
     internal weak var statusMenu: StatusMenu?
     
@@ -49,17 +49,20 @@ class KeypadView: UIView, BaseKeyboardView {
     private var leftButtons: [[KeypadButton]] = []
     private var rightButtons: [[KeypadButton]] = []
     
-    private var candidateOrganizer: CandidateOrganizer
+    public var candidateOrganizer: CandidateOrganizer? {
+        didSet {
+            candidatePaneView?.candidateOrganizer = candidateOrganizer
+        }
+    }
+    
     private var _state: KeyboardState
     var state: KeyboardState {
         get { _state }
         set { changeState(prevState: _state, newState: newValue) }
     }
     
-    init(state: KeyboardState, candidateOrganizer: CandidateOrganizer, layoutConstants: Reference<LayoutConstants>) {
+    init(state: KeyboardState) {
         self._state = state
-        self.candidateOrganizer = candidateOrganizer
-        self.layoutConstants = layoutConstants
         super.init(frame: .zero)
         
         backgroundColor = .clearInteractable
@@ -83,12 +86,11 @@ class KeypadView: UIView, BaseKeyboardView {
     }
     
     private func initView() {
-        guard let layoutConstants = layoutConstants else { return }
-        
         leftButtons = initButtons(buttonLayouts: leftButtonProps)
         rightButtons = initButtons(buttonLayouts: rightButtonProps)
         
-        let candidatePaneView = CandidatePaneView(keyboardState: state, candidateOrganizer: candidateOrganizer, layoutConstants: layoutConstants)
+        let candidatePaneView = CandidatePaneView(keyboardState: state, layoutConstants: layoutConstants)
+        candidatePaneView.candidateOrganizer = candidateOrganizer
         candidatePaneView.delegate = self
         addSubview(candidatePaneView)
         candidatePaneView.setupButtons()
@@ -131,7 +133,7 @@ class KeypadView: UIView, BaseKeyboardView {
     }
     
     override func layoutSubviews() {
-        guard let layoutConstants = layoutConstants?.ref else { return }
+        let layoutConstants = layoutConstants.ref
         
         directionalLayoutMargins = NSDirectionalEdgeInsets(top: layoutConstants.keyboardViewInsets.top,
                                                            leading: layoutConstants.keyboardViewInsets.left,
@@ -230,11 +232,11 @@ extension KeypadView: CandidatePaneViewDelegate, StatusMenuHandler {
     }
     
     var statusMenuOriginY: CGFloat {
-        layoutConstants?.ref.autoCompleteBarHeight ?? .zero
+        layoutConstants.ref.autoCompleteBarHeight
     }
     
     var keyboardSize: CGSize {
-        layoutConstants?.ref.keyboardSize ?? .zero
+        layoutConstants.ref.keyboardSize
     }
 }
 
