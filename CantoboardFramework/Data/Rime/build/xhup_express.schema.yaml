@@ -1,12 +1,12 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1641140856
-    default.custom: 1641140856
-    symbols: 1641140856
+    default: 1644509556
+    default.custom: 1644509556
+    symbols: 1644509556
     symbols.custom: 0
     xhup_express.custom: 0
-    xhup_express.schema: 1641140856
+    xhup_express.schema: 1644509556
 engine:
   filters:
     - simplifier
@@ -59,7 +59,7 @@ key_binder:
     - {accept: "Control+period", toggle: ascii_punct, when: always}
   import_preset: default
 menu:
-  page_size: 5
+  page_size: 10
 punctuator:
   full_shape:
     " ": {commit: "　"}

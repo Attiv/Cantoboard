@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1641140856
-    default.custom: 1641140856
+    default: 1644509556
+    default.custom: 1644509556
     numbers.custom: 0
-    numbers.schema: 1641140856
+    numbers.schema: 1644509556
 engine:
   processors:
     - key_binder
@@ -21,7 +21,7 @@ key_binder:
     - {accept: apostrophe, send: e, when: has_menu}
 menu:
   alternative_select_keys: acegi
-  page_size: 5
+  page_size: 10
 punctuator:
   full_shape:
     "!": "壹"
