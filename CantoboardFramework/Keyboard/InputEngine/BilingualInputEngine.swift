@@ -67,7 +67,8 @@ class BilingualInputEngine: InputEngine {
             
             var updateEnglishEngineState = false, updateRimeEngineState = false
             queue.async(group: group) {
-                updateRimeEngineState = self.rimeInputEngine.processChar(char.lowercasedChar)
+                updateRimeEngineState =
+                self.rimeInputEngine.processChar(char)
             }
             englishInputEngine.textBeforeInput = inputController?.textDocumentProxy?.documentContextBeforeInput
             englishInputEngine.textAfterInput = inputController?.textDocumentProxy?.documentContextAfterInput
@@ -198,6 +199,10 @@ class BilingualInputEngine: InputEngine {
         // DDLogInfo("English \(englishComposition.text) \(rimeRawInputCaretWithoutSpecialChars)")
         
         return updateEnglishEngineState
+    }
+    
+    var rimeRawInput: Composition? {
+        rimeInputEngine.rawInput
     }
     
     var rimeComposition: Composition? {

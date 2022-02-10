@@ -87,7 +87,7 @@ speller:
     - derive/c/ch/
 
     - abbrev/^([a-z]).+$/$1/ # 首字母簡拼
-    - abbrev/^([gk]w|ng).+$/$1/ # 首2字母簡拼
+    # - abbrev/^([gk]w|ng).+$/$1/ # 首2字母簡拼
 
     # 常見錯誤拼音 幫助港式拼音使用者上手
     # 聲母
@@ -131,14 +131,6 @@ translator:
   max_homophones: 10
   always_show_comments: true
   prism: yale
-  # Jyutping to Yale
-  # comment_format:
-    # - xform/aa(?=\d)/a/
-    # - xform/oe|eo/eu/
-    # - xform/jyu/yu/
-    # - xform/j/y/
-    # - xform/z/j/
-    # - xform/c/ch/
 
 variants_hk:
   option_name: variants_hk

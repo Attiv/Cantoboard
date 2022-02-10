@@ -23,6 +23,7 @@ public enum RimeSchema: String, Codable {
     case loengfan = "loengfan"
     case yinxing = "openfly"
     case wubi = "wubi86_jidian"
+    case jyutping10keys = "jyut6ping3_10keys"
     
     var signChar: String {
         switch self {
@@ -38,6 +39,7 @@ public enum RimeSchema: String, Codable {
         case .stroke: return "筆"
         case .yinxing: return "音"
         case .wubi: return "五"
+        case .jyutping10keys: return "粵"
         }
     }
     
@@ -54,6 +56,21 @@ public enum RimeSchema: String, Codable {
         case .stroke: return "筆劃"
         case .yinxing: return "音形"
         case .wubi: return "五笔"
+        case .jyutping10keys: return "粵格"
+        }
+    }
+    
+    var isKeypadBased: Bool {
+        switch self {
+        case .stroke, .jyutping10keys: return true
+        default: return false
+        }
+    }
+    
+    var is10Keys: Bool {
+        switch self {
+        case .jyutping10keys: return true
+        default: return false
         }
     }
     
@@ -78,7 +95,7 @@ public enum RimeSchema: String, Codable {
     
     var supportMixedMode: Bool {
         switch self {
-        case .stroke: return false
+        case .stroke, .jyutping10keys: return false
         default: return true
         }
     }
@@ -121,6 +138,7 @@ class RimeInputEngine: NSObject, InputEngine {
     }
     
     func processChar(_ char: Character) -> Bool {
+        let char = schema != .jyutping10keys ? char.lowercasedChar : char
         if let asciiValue = char.asciiValue {
             processKey(Int32(asciiValue))
             return true
@@ -307,8 +325,8 @@ class RimeInputEngine: NSObject, InputEngine {
     
     private func setCurrentSchema(_ schemaId: RimeSchema) {
         var rimeSchemaId = schemaId.rawValue
-        if schemaId == .jyutping && Settings.cached.toneInputMode == .vxq {
-            rimeSchemaId = "jyut6ping3vxq"
+        if schemaId.isCantonese && Settings.cached.toneInputMode == .vxq {
+            rimeSchemaId += "vxq"
         }
         rimeSession?.setCurrentSchema(rimeSchemaId)
     }

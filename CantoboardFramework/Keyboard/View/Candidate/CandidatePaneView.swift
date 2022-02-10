@@ -22,6 +22,7 @@ protocol CandidatePaneViewDelegate: NSObject {
 
 class CandidatePaneView: UIControl {
     private static let miniStatusSize = CGSize(width: 20, height: 20)
+    private static let separatorWidth: CGFloat = 1
     
     // Uncomment this to debug memory leak.
     private let c = InstanceCounter<CandidatePaneView>()
@@ -149,8 +150,8 @@ class CandidatePaneView: UIControl {
     }
     
     private weak var collectionView: CandidateCollectionView!
-    private weak var expandButton, backspaceButton, charFormButton: UIButton!
-    private weak var inputModeButton: StatusButton!
+    private weak var backspaceButton, charFormButton: UIButton!
+    private weak var expandButton, inputModeButton: StatusButton!
     private weak var leftSeparator, middleSeparator, rightSeparator: UIView!
     weak var delegate: CandidatePaneViewDelegate?
     
@@ -222,9 +223,15 @@ class CandidatePaneView: UIControl {
     }
     
     private func createButtons() {
-        expandButton = createAndAddButton(SimpleHighlightableButton())
+        expandButton = createAndAddButton(StatusButton())
         expandButton.addTarget(self, action: #selector(self.expandButtonClick), for: .touchUpInside)
-
+        expandButton.shouldShowStatusBackground = false
+        expandButton.handleStatusMenu = { [weak self] in
+            guard let self = self else { return false }
+            guard self.expandButton.shouldShowMenuIndicator else { return false }
+            return self.handleStatusMenu(from: $0, with: $1)
+        }
+        
         inputModeButton = createAndAddButton(StatusButton())
         inputModeButton.addTarget(self, action: #selector(self.filterButtonClick), for: .touchUpInside)
         inputModeButton.handleStatusMenu = { [weak self] in
@@ -252,7 +259,8 @@ class CandidatePaneView: UIControl {
     
     func setupButtons() {
         let expandButtonImage = mode == .row ? ButtonImage.paneExpandButtonImage : ButtonImage.paneCollapseButtonImage
-        expandButton.setImage(expandButtonImage, for: .normal)
+        expandButton.setImage(adjustImageFontSize(expandButtonImage), for: .normal)
+        expandButton.shouldShowMenuIndicator = mode == .row
         
         var title: String?
         var shouldShowMiniIndicator = false
@@ -273,8 +281,8 @@ class CandidatePaneView: UIControl {
         inputModeButton.setTitle(title, for: .normal)
         inputModeButton.shouldShowMenuIndicator = shouldShowMiniIndicator && mode == .row
 
-        backspaceButton.setImage(ButtonImage.backspace, for: .normal)
-        backspaceButton.setImage(ButtonImage.backspaceFilled, for: .highlighted)
+        backspaceButton.setImage(adjustImageFontSize(ButtonImage.backspace), for: .normal)
+        backspaceButton.setImage(adjustImageFontSize(ButtonImage.backspaceFilled), for: .highlighted)
         
         var charFormText: String
         if SessionState.main.lastCharForm == .simplified {
@@ -406,7 +414,7 @@ class CandidatePaneView: UIControl {
         guard let superview = superview else { return }
         
         let height = mode == .row ? rowHeight : superview.bounds.height
-        let candidateViewWidth = superview.bounds.width - expandButtonWidth - directionalLayoutMargins.trailing
+        let candidateViewWidth = superview.bounds.width - expandButtonWidth - Self.separatorWidth
         let leftRightInset = layoutConstants.ref.candidatePaneViewLeftRightInset
         
         let collectionViewFrame = CGRect(x: leftRightInset, y: 0, width: candidateViewWidth - leftRightInset * 2, height: height)
@@ -428,13 +436,13 @@ class CandidatePaneView: UIControl {
         
         let isPhone = layoutConstants.ref.idiom == .phone
         let topBottomMargin: CGFloat = mode == .row ? 8 : 0
-        let separatorFrame = CGRect(x: 0, y: topBottomMargin, width: 1, height: height - topBottomMargin * 2)
+        let separatorFrame = CGRect(x: 0, y: topBottomMargin, width: Self.separatorWidth, height: height - topBottomMargin * 2)
         
         if isPhone {
             leftSeparator.isHidden = true
         } else {
             leftSeparator.isHidden = false
-            leftSeparator.frame = separatorFrame.with(x: leftRightInset)
+            leftSeparator.frame = separatorFrame.with(x: leftRightInset - Self.separatorWidth)
         }
         
         if expandButton.isHidden {
@@ -482,6 +490,10 @@ class CandidatePaneView: UIControl {
             }
         }
         return super.hitTest(point, with: event)
+    }
+    
+    private func adjustImageFontSize(_ image: UIImage) -> UIImage {
+        image.withConfiguration(UIImage.SymbolConfiguration(pointSize: keyboardState.keyboardIdiom.isPad ? 24 : 20))
     }
 }
 

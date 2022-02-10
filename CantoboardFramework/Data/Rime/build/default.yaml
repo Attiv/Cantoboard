@@ -1,8 +1,8 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1641140856
-    default.custom: 1641140856
+    default: 1644267299
+    default.custom: 1644267299
 ascii_composer:
   switch_key:
     Control_L: noop
@@ -122,6 +122,16 @@ schema_list:
   - schema: wubi86_jidian_pinyin
   - schema: wubi86_jidian_trad
   - schema: wubi86_jidian_trad_pinyin
+  - schema: jyut6ping3
+  - schema: jyut6ping3vxq
+  - schema: yale
+  - schema: yalevxq
+  - schema: cangjie5
+  - schema: quick5
+  - schema: luna_pinyin
+  - schema: stroke
+  - schema: loengfan
+  - schema: jyut6ping3_10keys
 switcher:
   abbreviate_options: true
   caption: "〔方案選單〕"

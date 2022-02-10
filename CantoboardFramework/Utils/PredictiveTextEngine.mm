@@ -126,7 +126,12 @@ using namespace marisa;
     return self;
 }
 
-- (NSArray*)predict:(NSString*) context {
+static NSString* offensiveWords[] = {
+    @"屌", @"𨳒", @"鳩", @"𨳊", @"閪", @"撚", @"柒", @"仆街", @"老母", @"老味", // TC
+    @"鸠" // SC
+};
+
+- (NSArray*)predict:(NSString*) context filterOffensiveWords:(bool) shouldFilterOffensiveWords {
     if (header == nullptr) {
         return [[NSArray alloc] init];
     }
@@ -153,7 +158,7 @@ using namespace marisa;
         NSRange curCharRange = [context rangeOfComposedCharacterSequenceAtIndex:currentIndex];
         currentIndex += curCharRange.length;
         DDLogInfo(@"PredictiveTextEngine searching prefix: %@", prefixToSearch);
-        [self search:prefixToSearch output:results dedupSet:dedupSet];
+        [self search:prefixToSearch output:results dedupSet:dedupSet shouldFilterOffensiveWords:shouldFilterOffensiveWords];
     }
     
     NSArray *finalResults = [results subarrayWithRange:NSMakeRange(0, min((NSUInteger)kMaxNumberOfTerms, [results count]))];
@@ -173,7 +178,7 @@ struct PredictiveResult {
     bool isWord;
 };
 
-- (void)search:(NSString*) prefix output:(NSMutableArray*) output dedupSet:(NSMutableSet*) dedupSet {
+- (void)search:(NSString*) prefix output:(NSMutableArray*) output dedupSet:(NSMutableSet*) dedupSet shouldFilterOffensiveWords:(bool) shouldFilterOffensiveWords {
     if (header == nullptr) {
         return;
     }
@@ -199,20 +204,45 @@ struct PredictiveResult {
         NSString *fullText = [[NSString alloc] initWithBytes:text.c_str()
                                                       length:text.length()
                                                     encoding:NSUTF8StringEncoding];
+        
+        bool shouldFilter = false;
+        if (shouldFilterOffensiveWords) {
+            for (NSString* offensiveWord : offensiveWords) {
+                if ([fullText containsString: offensiveWord]) {
+                    shouldFilter = true;
+                    break;
+                }
+            }
+            if (shouldFilter) continue;
+        }
+        
         NSString *toAdd = nullptr;
+        
+        NSRange suffixRange = NSMakeRange([prefix length], [fullText length] - [prefix length]);
+        NSString *suffix = [fullText substringWithRange:suffixRange];
+        
         if (isWord) {
-            NSRange suffixRange = NSMakeRange([prefix length], [fullText length] - [prefix length]);
-            NSString *suffix = [fullText substringWithRange:suffixRange];
             toAdd = suffix;
-        } else if (fullText.lengthOfComposedChars == prefix.lengthOfComposedChars + 1) {
-            NSRange lastCharRange = [fullText rangeOfComposedCharacterSequenceAtIndex:fullText.length - 1];
-            NSString *lastChar = [fullText substringWithRange:lastCharRange];
-            toAdd = lastChar;
+        } else {
+            Agent trieAgent;
+            trieAgent.set_query([suffix UTF8String]);
+            
+            if ([suffix lengthOfComposedChars] == 1) {
+                // If the suffix has just a single char, always suggest it.
+                NSRange lastCharRange = [fullText rangeOfComposedCharacterSequenceAtIndex:fullText.length - 1];
+                NSString *lastChar = [fullText substringWithRange:lastCharRange];
+                toAdd = lastChar;
+            } else if (trie.lookup(trieAgent)) {
+                // If suffix is a word, suggest the whole word.
+                size_t suffixKeyId = trieAgent.key().id();
+                bool isSuffixWord = [self isWord:suffixKeyId];
+                if (isSuffixWord) toAdd = suffix;
+            }
         }
         
         if (toAdd == nullptr || toAdd.length == 0) continue;
 
-        // DDLogInfo(@"PredictiveTextEngine fullText %@ toAdd %@ isWord %s", fullText, toAdd, isWord ? "true" : "false");
+        DDLogInfo(@"PredictiveTextEngine fullText %@ toAdd %@ weight %f isWord %s", fullText, toAdd, weights[it->first], isWord ? "true" : "false");
         if (![dedupSet containsObject:toAdd]) {
             [output addObject:toAdd];
             [dedupSet addObject:toAdd];

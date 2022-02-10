@@ -66,7 +66,7 @@ struct KeyboardState: Equatable {
     }
     
     var shouldUseKeypad: Bool {
-        if activeSchema == .stroke && inputMode != .english,
+        if activeSchema.isKeypadBased && inputMode != .english,
            case .alphabetic = keyboardType {
             return true
         }
@@ -429,8 +429,6 @@ class InputController: NSObject {
             return
         case .toggleInputMode(let toInputMode):
             guard state.reverseLookupSchema == nil else {
-                // Disable reverse look up mode on tap.
-                state.reverseLookupSchema = nil
                 changeSchema()
                 return
             }
@@ -448,7 +446,7 @@ class InputController: NSObject {
             }
         case .reverseLookup(let schema):
             state.reverseLookupSchema = schema
-            changeSchema()
+            changeSchema(shouldLeaveReverseLookupMode: false)
             return
         case .changeSchema(let schema):
             state.mainSchema = schema
@@ -555,12 +553,12 @@ class InputController: NSObject {
         }
     }
     
-    private func changeSchema() {
+    private func changeSchema(shouldLeaveReverseLookupMode: Bool = true) {
         inputEngine.rimeSchema = state.activeSchema
         if state.inputMode == .english {
             handleKey(.toggleInputMode(state.inputMode.afterToggle))
         }
-        clearInput(shouldLeaveReverseLookupMode: false)
+        clearInput(shouldLeaveReverseLookupMode: shouldLeaveReverseLookupMode)
     }
     
     private func clearInput(shouldLeaveReverseLookupMode: Bool = true) {
@@ -671,6 +669,28 @@ class InputController: NSObject {
     
     private func updateComposition() {
         refreshInputSettings()
+        
+        if state.activeSchema.is10Keys && state.inputMode != .english {
+            let rimeCompositionText = inputEngine.rimeComposition?.text.filter({ $0 != " "}) ?? ""
+            let rimeRawInput = inputEngine.rimeRawInput?.text ?? ""
+            let pendingInput = rimeRawInput.commonSuffix(with: rimeCompositionText)
+            let selectedInput = rimeCompositionText.prefix(rimeCompositionText.count - pendingInput.count)
+            
+            let firstCandidateComment = inputEngine.getRimeCandidateComment(0) ?? ""
+            let firstCommentWithoutToneMatchingPendingInput = firstCandidateComment.reduce(("", 0), { strAndCounter, c in
+                var str = strAndCounter.0
+                var counter = strAndCounter.1
+                if strAndCounter.1 >= pendingInput.count || c.isNumber { return strAndCounter }
+                str.append(c)
+                if c != " " { counter += 1 }
+                return (str, counter)
+            }).0
+            
+            let composition = String(selectedInput + firstCommentWithoutToneMatchingPendingInput)
+            updateComposition(Composition(text: composition, caretIndex: composition.count))
+            return
+        }
+        
         switch state.inputMode {
         case .chinese: updateComposition(inputEngine.composition)
         case .english: updateComposition(inputEngine.englishComposition)
@@ -733,9 +753,11 @@ class InputController: NSObject {
         if let englishText = inputEngine.englishComposition?.text,
            var composingText = inputEngine.composition?.text.filter({ $0 != " " }),
            !composingText.isEmpty {
-            if state.inputMode == .english || state.inputMode == .mixed && composingText.first?.isEnglishLetter ?? false {
+            if inputEngine.rimeSchema.is10Keys && state.inputMode != .english {
+                composingText = inputEngine.getRimeCandidate(0) ?? ""
+            } else if state.inputMode == .english || state.inputMode == .mixed && composingText.first?.isEnglishLetter ?? false {
                 composingText = englishText
-            } else if inputEngine.rimeSchema == .jyutping && Settings.cached.toneInputMode == .vxq {
+            } else if inputEngine.rimeSchema.isCantonese && Settings.cached.toneInputMode == .vxq {
                 var englishTailLength = 0
                 for c in composingText.reversed() {
                     switch c {
