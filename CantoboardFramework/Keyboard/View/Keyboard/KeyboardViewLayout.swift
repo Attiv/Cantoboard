@@ -34,12 +34,12 @@ class CommonContextualKeys {
         case .symbol:
             let keyHint = "符"
             switch keyboardState.keyboardContextualType {
-            // case .chinese: return .character("，", keyHint, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
+//             case .chinese: return .character("，", keyHint, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
             // case .english: return .character(",", keyHint, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
             // case .rime: return .rime(.delimiter, keyHint, [KeyCap(rime: .delimiter), "`", ".", ",", "?", "!"])
             case .chinese: return .character("，", keyHint, nil, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
             case .english: return .character(",", keyHint, nil, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
-            case .rime: return .rime(.delimiter, keyHint, [KeyCap(rime: .delimiter), ".", ",", "?", "!"])
+            case .rime: return .rime(.delimiter, keyHint, [KeyCap(rime: .delimiter), "`", ".", ",", "?", "!"])
             case .url:
                 var children: [KeyCap] = ["/", ".", ".com", ".net", ".org", ".edu"]
                 if (keyboardState.isComposing) {
