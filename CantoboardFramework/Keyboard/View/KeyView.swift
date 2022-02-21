@@ -40,7 +40,11 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
     private var keyboardState: KeyboardState? = nil
     private var isPadTopRowButton = false
     private var action: KeyboardAction = .none
-    
+    private var comboCount: Int = 0
+    private var comboTimer: Timer?
+    private var inComboMode: Bool = false
+    private var lastComboText: String?
+
     private var layoutConstants: Reference<LayoutConstants>
 
     // TODO Remove this field and check keyboardState
@@ -132,6 +136,7 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
         self.selectedAction = keyCap.action
         self.isPadTopRowButton = isPadTopRowButton
         self.keyboardState = newState
+        updateComboMode(enabled: false)
         
         if newState.isKeyboardAppearing {
             swipeDownPercentage = 0
@@ -384,6 +389,25 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
             weight: .light)
         return image?.applyingSymbolConfiguration(config)
     }
+    
+    func dispatchKeyAction(_ action: KeyboardAction, _ delegate: KeyboardViewDelegate) {
+        if case .combo(let items) = keyCap {
+            for _ in 0..<(lastComboText?.count ?? 0) {
+                delegate.handleKey(.backspace)
+            }
+            
+            if let chosenItem = items[safe: comboCount] {
+                delegate.handleKey(.character(chosenItem))
+                lastComboText = chosenItem
+            }
+            
+            comboCount = (comboCount + 1) % items.count
+            updateComboMode(enabled: true)
+        } else {
+            delegate.handleKey(action)
+        }
+    }
+    
 }
 
 extension KeyView {
@@ -449,7 +473,7 @@ extension KeyView {
         touchBeginPosition = nil
         
         if swipeDownPercentage == 0 {
-            isHighlighted = false
+            isHighlighted = inComboMode
         } else {
             isGrayed = true
             firstFrame = true
@@ -469,6 +493,23 @@ extension KeyView {
     func keyLongPressed(_ touch: UITouch) {
         guard shouldAcceptLongPress else { return }
         updatePopup(isLongPress: true)
+    }
+    
+    func updateComboMode(enabled: Bool) {
+        inComboMode = enabled
+        if enabled {
+            comboTimer?.invalidate()
+            comboTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { [self] _ in
+                isHighlighted = false
+                updateComboMode(enabled: false)
+            }
+        } else {
+            comboTimer?.invalidate()
+            comboTimer = nil
+            isHighlighted = false
+            comboCount = 0
+            lastComboText = nil
+        }
     }
     
     private func createPopupViewIfNecessary() {

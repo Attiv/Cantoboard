@@ -11,10 +11,12 @@ import UIKit
 struct KeypadButtonProps {
     var keyCap: KeyCap
     let colRowSize: CGSize
+    let autoSuggestionOverride: AutoSuggestionType?
     
-    init(keyCap: KeyCap, colRowSize: CGSize? = nil) {
+    init(keyCap: KeyCap, colRowSize: CGSize? = nil, autoSuggestionOverride: AutoSuggestionType? = nil) {
         self.keyCap = keyCap
         self.colRowSize = colRowSize ?? CGSize(width: 1, height: 1)
+        self.autoSuggestionOverride = autoSuggestionOverride
     }
 }
 
@@ -44,17 +46,17 @@ class KeypadView: UIView, BaseKeyboardView {
     ]
     
     private let rightButtonJyutPingProps: [[KeypadButtonProps]] = [
-        [ KeypadButtonProps(keyCap: " "),
+        [ KeypadButtonProps(keyCap: .combo(["，", "。", "？", "！"]), autoSuggestionOverride: .keypadSymbols),
           KeypadButtonProps(keyCap: .jyutPing10Keys("A")),
-          KeypadButtonProps(keyCap: .jyutPing10Keys("B")),
-          KeypadButtonProps(keyCap: .backspace) ],
-        [ KeypadButtonProps(keyCap: .jyutPing10Keys("C")),
           KeypadButtonProps(keyCap: .jyutPing10Keys("D")),
-          KeypadButtonProps(keyCap: .jyutPing10Keys("E")),
-          KeypadButtonProps(keyCap: .rime(RimeChar.delimiter, nil, nil))],
-        [ KeypadButtonProps(keyCap: .jyutPing10Keys("F")),
-          KeypadButtonProps(keyCap: .jyutPing10Keys("G")),
-          KeypadButtonProps(keyCap: .jyutPing10Keys("H")), KeypadButtonProps(keyCap: .returnKey(.default), colRowSize: CGSize(width: 1, height: 2)) ],
+          KeypadButtonProps(keyCap: .backspace) ],
+        [ KeypadButtonProps(keyCap: .jyutPing10Keys("G")),
+          KeypadButtonProps(keyCap: .jyutPing10Keys("J")),
+          KeypadButtonProps(keyCap: .jyutPing10Keys("M")),
+          KeypadButtonProps(keyCap: .keypadRimeDelimiter)],
+        [ KeypadButtonProps(keyCap: .jyutPing10Keys("P")),
+          KeypadButtonProps(keyCap: .jyutPing10Keys("T")),
+          KeypadButtonProps(keyCap: .jyutPing10Keys("W")), KeypadButtonProps(keyCap: .returnKey(.default), colRowSize: CGSize(width: 1, height: 2)) ],
         [ KeypadButtonProps(keyCap: .space(.space), colRowSize: CGSize(width: 3, height: 1)) ],
     ]
     
@@ -96,7 +98,7 @@ class KeypadView: UIView, BaseKeyboardView {
             touchHandler = nil
         } else {
             let touchHandler = TouchHandler(keyboardView: self, keyboardIdiom: state.keyboardIdiom)
-            touchHandler.allowCaretSwiping = !state.activeSchema.is10Keys
+            touchHandler.isInKeyboardMode = !state.activeSchema.is10Keys
             self.touchHandler = touchHandler
         }
     }
@@ -151,6 +153,7 @@ class KeypadView: UIView, BaseKeyboardView {
                 button.colRowSize = props.colRowSize
                 button.setKeyCap(keyCap, keyboardState: state)
                 button.highlightedColor = keyCap.buttonBgHighlightedColor
+                button.autoSuggestionOverride = props.autoSuggestionOverride
                 buttonRow.append(button)
                 x += 1
             }
@@ -162,7 +165,7 @@ class KeypadView: UIView, BaseKeyboardView {
     }
     
     private func setupButtons() {
-        touchHandler?.allowCaretSwiping = !state.activeSchema.is10Keys
+        touchHandler?.isInKeyboardMode = !state.activeSchema.is10Keys
         
         leftButtons = initButtons(buttonLayouts: leftButtonProps, existingButtons: leftButtons)
         
@@ -286,6 +289,14 @@ extension KeypadView {
         super.touchesBegan(touches, with: event)
         guard let touch = touches.first,
               let keypadButton = touch.view as? KeyView else { return }
+        
+        // Reset other combo buttons.
+        let allButtons = (leftButtons + rightButtons).flatMap { $0 }
+        allButtons.forEach { button in
+            if keypadButton !== button {
+                button.updateComboMode(enabled: false)
+            }
+        }
         
         touchHandler?.touchBegan(touch, key: keypadButton, with: event)
     }

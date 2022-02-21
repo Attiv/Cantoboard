@@ -88,6 +88,13 @@ public enum RimeSchema: String, Codable {
     
     var isCantonese: Bool {
         switch self {
+        case .jyutping, .yale, .jyutping10keys: return true
+        default: return false
+        }
+    }
+    
+    var supportCantoneseTonalInput: Bool {
+        switch self {
         case .jyutping, .yale: return true
         default: return false
         }
@@ -139,6 +146,7 @@ class RimeInputEngine: NSObject, InputEngine {
     
     func processChar(_ char: Character) -> Bool {
         let char = schema != .jyutping10keys ? char.lowercasedChar : char
+        if rawInput?.text.last == "'" && char == "'" { return true }
         if let asciiValue = char.asciiValue {
             processKey(Int32(asciiValue))
             return true
@@ -178,8 +186,13 @@ class RimeInputEngine: NSObject, InputEngine {
     }
     
     private func refreshCandidates() {
+        loadedCandidatesCount = 0
+        totalCandidatesCount = 0
         hasLoadedAllCandidates = false
         rimeSession?.setCandidateMenuToFirstPage()
+        
+        rimeSession?.loadMoreCandidates()
+        loadedCandidatesCount = min(20, Int(rimeSession?.getLoadedCandidatesCount() ?? 0))
     }
         
     func moveCaret(offset: Int) -> Bool {
@@ -223,20 +236,18 @@ class RimeInputEngine: NSObject, InputEngine {
         return rimeSession?.getComment(UInt32(index))
     }
     
+    private(set) var loadedCandidatesCount = 0
+    private(set) var totalCandidatesCount = 0
+    
     // Return false if it loaded all candidates
     func loadMoreCandidates() -> Bool {
-        guard let rimeSession = rimeSession else {
-            DDLogInfo("loadMoreCandidates RimeSession is nil.")
-            hasLoadedAllCandidates = true
-            return false
-        }
-        let hasRemainingCandidates = rimeSession.loadMoreCandidates()
-        hasLoadedAllCandidates = !hasRemainingCandidates
-        return hasRemainingCandidates
-    }
-    
-    var loadedCandidatesCount: Int {
-        Int(rimeSession?.getLoadedCandidatesCount() ?? 0)
+        guard !hasLoadedAllCandidates, let rimeSession = rimeSession else { return false }
+        
+        totalCandidatesCount = Int(rimeSession.getLoadedCandidatesCount())
+        loadedCandidatesCount = min(loadedCandidatesCount + 20, totalCandidatesCount)
+        
+        hasLoadedAllCandidates = loadedCandidatesCount == totalCandidatesCount
+        return !hasLoadedAllCandidates
     }
     
     func selectCandidate(_ index: Int) -> String? {
@@ -325,7 +336,7 @@ class RimeInputEngine: NSObject, InputEngine {
     
     private func setCurrentSchema(_ schemaId: RimeSchema) {
         var rimeSchemaId = schemaId.rawValue
-        if schemaId.isCantonese && Settings.cached.toneInputMode == .vxq {
+        if schemaId.supportCantoneseTonalInput && Settings.cached.toneInputMode == .vxq {
             rimeSchemaId += "vxq"
         }
         rimeSession?.setCurrentSchema(rimeSchemaId)

@@ -339,6 +339,7 @@ class LayoutConstants: Copyable {
     
     let candidatePaneViewLeftRightInset: CGFloat
     let compositionViewHeight: CGFloat
+    let filterBarViewHeight: CGFloat
     
     var numOfSingleCharCandidateInRow: Double {
         switch idiom {
@@ -397,6 +398,7 @@ class LayoutConstants: Copyable {
             candidatePaneViewLeftRightInset = isPortrait ? 186 : 223
         }
         compositionViewHeight = idiom == .phone ? 24 : 28
+        filterBarViewHeight = 32
         statusMenuWidth = 3 / 7 * keyboardSize.width
         statusMenuItemHeight = keyboardSize.height / (idiom == .phone && !isPortrait ? 3.5 : 5)
     }
@@ -418,6 +420,7 @@ class LayoutConstants: Copyable {
         self.compositionViewHeight = copyOf.compositionViewHeight
         self.statusMenuWidth = copyOf.statusMenuWidth
         self.statusMenuItemHeight = copyOf.statusMenuItemHeight
+        self.filterBarViewHeight = copyOf.filterBarViewHeight
     }
     
     func copy() -> Self {
@@ -910,7 +913,8 @@ extension LayoutConstants {
              .rime,
              .space,
              .toggleInputMode,
-             "^_^": return 16
+             "^_^",
+             .keypadRimeDelimiter: return 16
         case .returnKey, "\t", .shift, .nextKeyboard, .dismissKeyboard: return 18
         case .cangjie(_, true), .backspace: return 20
         case .currency where idiom.isPad: return 20

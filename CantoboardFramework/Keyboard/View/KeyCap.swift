@@ -99,7 +99,9 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
     currency,
     dismissKeyboard,
     exit,
-    placeholder(KeyCap)
+    placeholder(KeyCap),
+    combo(/* Combo keycaps */ [String]), // e.g. combo(["A", "B"]) click once to insert A, click twice to replace A with B.
+    keypadRimeDelimiter
     
     private static let cangjieKeyCaps = ["日", "月", "金", "木", "水", "火", "土", "竹", "戈", "十", "大", "中", "一", "弓", "人", "心", "手", "口", "尸", "廿", "山", "女", "田", "難", "卜", "符"]
     
@@ -138,6 +140,8 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case .singleQuote: return .quote(false)
         case .doubleQuote: return .quote(true)
         case .dismissKeyboard: return .dismissKeyboard
+        case .combo: return .none // Dynamically evaluated in KeyView.
+        case .keypadRimeDelimiter: return .rime(.delimiter)
         default: return .none
         }
     }
@@ -148,7 +152,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         default: return nil
         }
     }
-        
+    
     var buttonBgColor: UIColor {
         switch self {
         case .shift(.uppercased), .shift(.capsLocked): return ButtonColor.shiftKeyHighlightedBackgroundColor
@@ -177,7 +181,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
     var keyCapType: KeyCapType {
         switch self {
         case "\t": return .system
-        case .character, .cangjie, .contextual, .currency, .singleQuote, .doubleQuote, .stroke, .jyutPing10Keys, .rime: return .input
+        case .character, .cangjie, .contextual, .currency, .singleQuote, .doubleQuote, .stroke, .jyutPing10Keys, .rime, .combo: return .input
         case .space: return .space
         case .returnKey: return .returnKey
         default: return .system
@@ -293,18 +297,20 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case .jyutPing10Keys(let c):
             switch c {
             case "A": return "A B C"
-            case "B": return "D E F"
-            case "C": return "G H I"
-            case "D": return "J K L"
-            case "E": return "M N O"
-            case "F": return "P Q R S"
-            case "G": return "T U V"
-            case "H": return "W X Y Z"
+            case "D": return "D E F"
+            case "G": return "G H I"
+            case "J": return "J K L"
+            case "M": return "M N O"
+            case "P": return "P Q R S"
+            case "T": return "T U V"
+            case "W": return "W X Y Z"
             default: return nil
             }
         case .exportFile(let namePrefix, _): return namePrefix.capitalized
         case .currency: return SessionState.main.currencySymbol
         case .exit: return "Exit"
+        case .combo(let items): return items.joined()
+        case .keypadRimeDelimiter: return "分隔"
         default: return nil
         }
     }
@@ -315,7 +321,6 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case _ where keyCapType == .input: return UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 0)
         default: return .zero
         }
-
     }
     
     var buttonRightHint: String? {
@@ -378,7 +383,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case "0": return ["0", "０", "零", "十", "拾", "⓪", "°"]
         // 123 2nd row
         case "-": return ["-", "－", "–", "—", "•"]
-        case "/": return ["/", "／", "\\"]
+        case "/": return ["/", "／", "\\", "÷"]
         case ":": return [":", "："]
         case ";": return [";", "；"]
         case "(": return ["(", "（"]
@@ -404,7 +409,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case "#": return ["#", "＃"]
         case "%": return ["%", "％", "‰"]
         case "^": return ["^", "＾"]
-        case "*": return ["*", "＊"]
+        case "*": return ["*", "＊", "×"]
         case "+": return ["+", "＋"]
         case "=": return ["=", "≠", "≈", "＝"]
         // #+= 2nd row
@@ -508,12 +513,15 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
 }
 
 enum SpecialSymbol: CaseIterable {
-    case slash, dot, parenthesis, curlyBracket, squareBracket, angleBracket, doubleAngleBracket
+    case colon, dot, minus, slash,
+         parenthesis, curlyBracket, squareBracket, angleBracket, doubleAngleBracket
     
     var keyCapPairs: [(half: KeyCap, full: KeyCap)] {
         switch self {
-        case .slash: return [(half: "/", full: "／")]
+        case .colon: return [(half: ":", full: "：")]
         case .dot: return [(half: ".", full: "。")]
+        case .minus: return [(half: "-", full: "—")]
+        case .slash: return [(half: "/", full: "／")]
         case .parenthesis: return [(half: "(", full: "（"), (half: ")", full: "）")]
         case .curlyBracket: return [(half: "{", full: "｛"), (half: "}", full: "｝")]
         case .squareBracket: return [(half: "[", full: "［"), (half: "]", full: "］")]
@@ -544,7 +552,7 @@ enum SpecialSymbol: CaseIterable {
         switch symbolShape {
         case .smart:
             switch self {
-            case .slash, .dot: return Self.determineSymbolShapeFromLastChar(textBefore: textBefore)
+            case .colon, .dot, .minus, .slash: return Self.determineSymbolShapeFromLastChar(textBefore: textBefore)
             case .parenthesis, .curlyBracket, .squareBracket, .angleBracket, .doubleAngleBracket:
                 return determineSymbolShapeFromLastMatchingChar(textBefore: textBefore)
             }

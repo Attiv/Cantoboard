@@ -73,6 +73,9 @@ struct KeyboardState: Equatable {
         return false
     }
     
+    var filters: [String]?
+    var selectedFilterIndex: Int?
+    
     init() {
         keyboardType = KeyboardType.alphabetic(.lowercased)
         lastKeyboardTypeChangeFromAutoCap = false
@@ -113,10 +116,13 @@ class InputController: NSObject {
     private var shouldApplyChromeSearchBarHack = false
     private var needClearInput = false, needReloadCandidates = false
     
+    private var autoSuggestionTypeOverride: AutoSuggestionType?
+    private var replaceTextLen = 0;
+
     private var prevTextBefore: String?
     
     private(set) var candidateOrganizer: CandidateOrganizer!
-    
+
     var textDocumentProxy: UITextDocumentProxy? {
         keyboardViewController?.textDocumentProxy
     }
@@ -182,6 +188,18 @@ class InputController: NSObject {
     
     private func candidateSelected(choice: IndexPath, enableSmartSpace: Bool) {
         if let commitedText = candidateOrganizer.selectCandidate(indexPath: choice) {
+            if candidateOrganizer?.autoSuggestionType?.replaceTextOnInsert ?? false {
+                textDocumentProxy?.deleteBackward(times: replaceTextLen)
+                replaceTextLen = 0
+                if candidateOrganizer?.autoSuggestionType == .keypadSymbols {
+                    // If we are inserting pairs e.g. bracket, move the caret inside the pair.
+                    insertText(commitedText, requestSmartSpace: enableSmartSpace)
+                    if commitedText.count == 2 && commitedText.char(at: 0) != commitedText.char(at: 1) {
+                        textDocumentProxy?.adjustTextPosition(byCharacterOffset: -1)
+                    }
+                    return
+                }
+            }
             if commitedText.allSatisfy({ $0.isEnglishLetter }) {
                 EnglishInputEngine.userDictionary.learnWord(word: commitedText)
             }
@@ -312,10 +330,12 @@ class InputController: NSObject {
         needClearInput = false
         needReloadCandidates = true
         let isComposing = inputEngine.isComposing
+        var hasMutatedComposition = false
         
         switch action {
         case .moveCursorForward, .moveCursorBackward:
             moveCursor(offset: action == .moveCursorBackward ? -1 : 1)
+            hasMutatedComposition = true
         case .character(let c):
             guard let char = c.first else { return }
             if !isComposing && shouldApplyChromeSearchBarHack {
@@ -338,6 +358,7 @@ class InputController: NSObject {
                 state.keyboardType = .alphabetic(.lowercased)
                 state.lastKeyboardTypeChangeFromAutoCap = false
             }
+            hasMutatedComposition = true
         case .rime(let rc):
             guard isComposing || rc == .sym else { return }
             if (inputEngine.rimeSchema.isVitta && rc == .delimiter) {
@@ -345,10 +366,13 @@ class InputController: NSObject {
             } else {
                 _ = inputEngine.processRimeChar(rc.rawValue)
             }
+            hasMutatedComposition = true
         case .space(let spaceKeyMode):
             handleSpace(spaceKeyMode: spaceKeyMode)
+            hasMutatedComposition = true
         case .quote(let isDoubleQuote):
             handleQuote(isDoubleQuote: isDoubleQuote)
+            hasMutatedComposition = true
         case .newLine:
             if !insertComposingText(shouldDisableSmartSpace: true) || isImmediateMode {
                 let shouldApplyBrowserYoutubeSearchHack = textDocumentProxy.returnKeyType == .search && !isImmediateMode
@@ -362,9 +386,13 @@ class InputController: NSObject {
                     insertText("\n")
                 }
             }
+            hasMutatedComposition = true
         case .backspace, .deleteWord, .deleteWordSwipe:
-            if state.reverseLookupSchema != nil && !isComposing {
+            if action == .backspace && state.selectedFilterIndex != nil {
+                state.selectedFilterIndex = nil
+            } else if state.reverseLookupSchema != nil && !isComposing {
                 clearInput(shouldLeaveReverseLookupMode: true)
+                hasMutatedComposition = true
             } else if isComposing {
                 if action == .deleteWordSwipe {
                     needClearInput = true
@@ -381,6 +409,7 @@ class InputController: NSObject {
                 if !inputEngine.isComposing {
                     keyboardViewController?.keyboardView?.changeCandidatePaneMode(.row)
                 }
+                hasMutatedComposition = true
             } else {
                 switch action {
                 case .backspace: textDocumentProxy.deleteBackward()
@@ -393,12 +422,14 @@ class InputController: NSObject {
                     }
                 default:()
                 }
+                hasMutatedComposition = true
             }
         case .emoji(let e):
             FeedbackProvider.play(keyboardAction: action)
             if !insertComposingText(appendBy: e, shouldDisableSmartSpace: true) {
                 textDocumentProxy.insertText(e)
             }
+            hasMutatedComposition = true
         case .shiftDown:
             isHoldingShift = true
             state.keyboardType = .alphabetic(.uppercased)
@@ -419,6 +450,7 @@ class InputController: NSObject {
             state.lastKeyboardTypeChangeFromAutoCap = false
             checkAutoCap()
             updateSpaceState()
+            refreshInputSettings()
             return
         case .setCharForm(let cs):
             inputEngine.charForm = cs
@@ -433,7 +465,7 @@ class InputController: NSObject {
                 return
             }
             
-            if (state.mainSchema == .stroke) {
+            if (state.mainSchema == .stroke || state.mainSchema.is10Keys) {
                 clearInput()
             }
             
@@ -455,6 +487,8 @@ class InputController: NSObject {
             return
         case .selectCandidate(let choice):
             candidateSelected(choice: choice, enableSmartSpace: true)
+            candidateOrganizer.filterPrefix = nil
+            hasMutatedComposition = true
         case .longPressCandidate(let choice):
             candidateLongPressed(choice: choice)
         case .exportFile(let namePrefix, let path):
@@ -483,13 +517,30 @@ class InputController: NSObject {
         case .resetComposition:
             compositionRenderer.textReset()
             needClearInput = true
+            hasMutatedComposition = true
+        case .setAutoSuggestion(let newAutoSuggestionType, let replaceTextLen):
+            autoSuggestionTypeOverride = newAutoSuggestionType
+            self.replaceTextLen = replaceTextLen
+            updateInputState()
+            return
+        case .setFilter(let filterIndex):
+            candidateOrganizer.filterPrefix = state.filters?[safe: filterIndex]
+            candidateOrganizer.updateCandidates(reload: true)
+            state.selectedFilterIndex = filterIndex
+            return
         case .exit: exit(0)
         default: ()
         }
+        autoSuggestionTypeOverride = nil
         if needClearInput {
             clearInput()
         } else {
             updateInputState()
+        }
+        if hasMutatedComposition {
+            state.filters = []
+            state.selectedFilterIndex = nil
+            candidateOrganizer.filterPrefix = nil
         }
         updateComposition()
     }
@@ -509,8 +560,11 @@ class InputController: NSObject {
             }
         }
         
-        keyboardViewController?.hasCompositionView = isImmediateMode || state.activeSchema.isCangjieFamily && state.inputMode == .mixed
-        keyboardViewController?.hasCompositionResetButton = isImmediateMode && state.isComposing
+        let activeSchema = state.activeSchema
+        let is10Keys = activeSchema == .jyutping10keys && state.inputMode != .english
+        keyboardViewController?.hasFilterBar = is10Keys && state.keyboardType != .emojis
+        keyboardViewController?.hasCompositionView = !is10Keys && (isImmediateMode || activeSchema.isCangjieFamily && state.inputMode == .mixed)
+        keyboardViewController?.hasCompositionResetButton = !is10Keys && isImmediateMode && state.isComposing
     }
     
     func isTextFieldWebSearch() -> Bool {
@@ -567,6 +621,7 @@ class InputController: NSObject {
             state.reverseLookupSchema = nil
             inputEngine.rimeSchema = state.activeSchema
         }
+        replaceTextLen = 0
         updateInputState()
         updateComposition()
     }
@@ -667,27 +722,132 @@ class InputController: NSObject {
         state.spaceKeyMode = isFullWidth ? .fullWidthSpace : .space
     }
     
+    private static func is10KeysSubKey(_ inputCode: Character, _ candidateCode: Character) -> Bool {
+        switch candidateCode {
+        case "a"..."c": return inputCode == "A"
+        case "d"..."f": return inputCode == "D"
+        case "g"..."i": return inputCode == "G"
+        case "j"..."l": return inputCode == "J"
+        case "m"..."o": return inputCode == "M"
+        case "p"..."s": return inputCode == "P"
+        case "t"..."v": return inputCode == "T"
+        case "w"..."z": return inputCode == "W"
+        default: return false
+        }
+    }
+    
+    private func update10KeysComposition() {
+        let rimeRawInput = inputEngine.rimeRawInput?.text ?? ""
+        guard !rimeRawInput.isEmpty,
+              let rimeComposition = inputEngine.rimeComposition else {
+            updateComposition(nil)
+            return
+        }
+        let rimeCompositionText = inputEngine.rimeComposition?.text.filter({ $0 != " "}) ?? ""
+        
+        // Remaining input excluding selected text.
+        let inputRemaining = rimeRawInput.commonSuffix(with: rimeCompositionText)
+        
+        let candidateCode = (inputEngine.getRimeCandidateComment(0) ?? "").filter { !$0.isNumber }
+        
+        var cIndex = candidateCode.startIndex
+        var iIndex = inputRemaining.startIndex
+        
+        var morphedInput = ""
+        // Scan the pending input string.
+        while (iIndex < inputRemaining.endIndex) {
+            let ic = inputRemaining[iIndex]
+            
+            // Ran out of candidate code. Just copy what's left in the input.
+            if cIndex == candidateCode.endIndex {
+                morphedInput.append(ic.lowercasedChar)
+                iIndex = inputRemaining.index(after: iIndex)
+                continue
+            }
+            
+            let cc = candidateCode[cIndex]
+            
+            // NSLog("UFO iteration \(ic) \(cc)")
+            if cc == " " {
+                // If the candidate code is a space, append.
+                if ic == "'" {
+                    // Consume the "'" in input buffer
+                    morphedInput.append("'")
+                    iIndex = inputRemaining.index(after: iIndex)
+                } else {
+                    morphedInput.append(" ")
+                }
+                cIndex = candidateCode.index(after: cIndex)
+            } else if ic == "'" {
+                // Insert ' and skip to the code of the next candidate char
+                morphedInput.append(ic)
+                iIndex = inputRemaining.index(after: iIndex)
+                
+                while cIndex < candidateCode.endIndex && candidateCode[cIndex] != " " {
+                    cIndex = candidateCode.index(after: cIndex)
+                }
+            } else {
+                // Overwrite input char by the candidate code.
+                if !Self.is10KeysSubKey(ic, cc) {
+                    // If we encounter an input letter cannot be mapped to the current candidate letter,
+                    // skip to next candidate char.
+                    while cIndex < candidateCode.endIndex && candidateCode[cIndex] != " " {
+                        cIndex = candidateCode.index(after: cIndex)
+                    }
+                    continue
+                }
+                morphedInput.append(cc)
+                cIndex = candidateCode.index(after: cIndex)
+                iIndex = inputRemaining.index(after: iIndex)
+            }
+        }
+        
+        let selectedInput = rimeCompositionText.prefix(rimeCompositionText.count - inputRemaining.count)
+        //NSLog("UFO selectedInput \(selectedInput)")
+        
+        let composition = String(selectedInput + morphedInput)
+        let inputCaretPosFromTheRight = rimeComposition.text.count - rimeComposition.caretIndex
+        let caretPos = composition.count - inputCaretPosFromTheRight
+        updateComposition(Composition(text: composition, caretIndex: caretPos))
+        
+        updateFilterBar(inputRemaining)
+    }
+    
+    private func updateFilterBar(_ inputRemaining: String) {
+        let prefixes = candidateOrganizer.candidateSource?.getCandidatePrefixes()
+        var filterSet = Set<String>()
+        let filters = prefixes?.compactMap { prefix -> String? in
+            var iIndex = inputRemaining.startIndex
+            var cIndex = prefix.startIndex
+            
+            var filter = ""
+            while (iIndex < inputRemaining.endIndex && cIndex < prefix.endIndex) {
+                let ic = inputRemaining[iIndex]
+                let cc = prefix[cIndex]
+                
+                if Self.is10KeysSubKey(ic, cc) {
+                    filter.append(cc)
+                } else {
+                    break
+                }
+                cIndex = prefix.index(after: cIndex)
+                iIndex = inputRemaining.index(after: iIndex)
+            }
+            guard !filter.isEmpty && !filterSet.contains(filter) else { return nil }
+            // NSLog("UFO \(inputRemaining) \(prefix) \(filter)")
+            filterSet.insert(filter)
+            return filter
+        }
+        candidateOrganizer.filterPrefix = nil
+        state.filters = filters
+        // DDLogInfo("UFO \(filters)")
+    }
+    
     private func updateComposition() {
         refreshInputSettings()
-        
+
         if state.activeSchema.is10Keys && state.inputMode != .english {
-            let rimeCompositionText = inputEngine.rimeComposition?.text.filter({ $0 != " "}) ?? ""
-            let rimeRawInput = inputEngine.rimeRawInput?.text ?? ""
-            let pendingInput = rimeRawInput.commonSuffix(with: rimeCompositionText)
-            let selectedInput = rimeCompositionText.prefix(rimeCompositionText.count - pendingInput.count)
-            
-            let firstCandidateComment = inputEngine.getRimeCandidateComment(0) ?? ""
-            let firstCommentWithoutToneMatchingPendingInput = firstCandidateComment.reduce(("", 0), { strAndCounter, c in
-                var str = strAndCounter.0
-                var counter = strAndCounter.1
-                if strAndCounter.1 >= pendingInput.count || c.isNumber { return strAndCounter }
-                str.append(c)
-                if c != " " { counter += 1 }
-                return (str, counter)
-            }).0
-            
-            let composition = String(selectedInput + firstCommentWithoutToneMatchingPendingInput)
-            updateComposition(Composition(text: composition, caretIndex: composition.count))
+            update10KeysComposition()
             return
         }
         
@@ -754,10 +914,15 @@ class InputController: NSObject {
            var composingText = inputEngine.composition?.text.filter({ $0 != " " }),
            !composingText.isEmpty {
             if inputEngine.rimeSchema.is10Keys && state.inputMode != .english {
-                composingText = inputEngine.getRimeCandidate(0) ?? ""
+                let rimeCompositionText = inputEngine.rimeComposition?.text.filter({ $0 != " "}) ?? ""
+                let rimeRawInput = inputEngine.rimeRawInput?.text ?? ""
+                let inputRemaining = rimeRawInput.commonSuffix(with: rimeCompositionText)
+                let selectedInput = rimeCompositionText.prefix(rimeCompositionText.count - inputRemaining.count)
+                let bestCandidate = inputEngine.getRimeCandidate(0) ?? ""
+                composingText = selectedInput + bestCandidate
             } else if state.inputMode == .english || state.inputMode == .mixed && composingText.first?.isEnglishLetter ?? false {
                 composingText = englishText
-            } else if inputEngine.rimeSchema.isCantonese && Settings.cached.toneInputMode == .vxq {
+            } else if inputEngine.rimeSchema.supportCantoneseTonalInput && Settings.cached.toneInputMode == .vxq {
                 var englishTailLength = 0
                 for c in composingText.reversed() {
                     switch c {
@@ -941,6 +1106,11 @@ class InputController: NSObject {
             return
         }
         
+        if let autoSuggestionTypeOverride = autoSuggestionTypeOverride {
+            newAutoSuggestionType = autoSuggestionTypeOverride
+            return
+        }
+        
         switch lastCharBefore {
         case "@":
             newAutoSuggestionType = .email
@@ -954,7 +1124,7 @@ class InputController: NSObject {
         switch state.keyboardContextualType {
         case .english where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
             newAutoSuggestionType = .halfWidthPunctuation
-        case .chinese where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty, .url:
+        case .chinese where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
             newAutoSuggestionType = .fullWidthPunctuation
         default:
             if lastCharBefore.isNumber {
