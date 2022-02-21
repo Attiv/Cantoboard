@@ -189,6 +189,7 @@
 		79D4E23B264251C600857D7D /* EnglishDictSource in Resources */ = {isa = PBXBuildFile; fileRef = 79D4E23A264251C600857D7D /* EnglishDictSource */; };
 		79D4E244264262D200857D7D /* UnihanSource in Resources */ = {isa = PBXBuildFile; fileRef = 79D4E243264262D200857D7D /* UnihanSource */; };
 		79E98DBD2672FC92006E32DE /* StatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E98DBC2672FC92006E32DE /* StatusMenu.swift */; };
+		AEF24C1127C3F39600013C6C /* FilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF24C1027C3F39600013C6C /* FilterBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -493,6 +494,7 @@
 		79D4E243264262D200857D7D /* UnihanSource */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UnihanSource; sourceTree = "<group>"; };
 		79D7180525FDA0C400A25AC3 /* CantoboardTestApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CantoboardTestApp.entitlements; sourceTree = "<group>"; };
 		79E98DBC2672FC92006E32DE /* StatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMenu.swift; sourceTree = "<group>"; };
+		AEF24C1027C3F39600013C6C /* FilterBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -754,6 +756,7 @@
 		79B9B59E25F34A1200238E80 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				AEF24C1027C3F39600013C6C /* FilterBarView.swift */,
 				79BE974E26D73D680059E58A /* BaseKeyboardView.swift */,
 				79BE977826D74A250059E58A /* Candidate */,
 				795A69DB2700810F00CDDC52 /* CompositionLabel.swift */,
@@ -1445,6 +1448,7 @@
 				79B9B60425F34A1200238E80 /* KeyboardViewController.swift in Sources */,
 				7906D6BA26D8A7F5004C3C0F /* Reference.swift in Sources */,
 				79B9B5F925F34A1200238E80 /* FeedbackProvider.swift in Sources */,
+				AEF24C1127C3F39600013C6C /* FilterBarView.swift in Sources */,
 				7922EF3526D61A99007E1699 /* CGRect+Extension.swift in Sources */,
 				795B22D5261EEE1400271D9F /* UserDictionary.swift in Sources */,
 				799AE20C26793F6D00286530 /* HighlightableButton.swift in Sources */,
