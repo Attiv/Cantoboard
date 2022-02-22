@@ -2,12 +2,12 @@ __build_info:
   rime_version: 1.7.3
   timestamps:
     common.custom: 0
-    default: 1644509556
-    default.custom: 1644509556
-    symbols: 1644509556
+    default: 1645460514
+    default.custom: 1645460514
+    symbols: 1645460514
     symbols.custom: 0
-    symbols_cantonese: 1644509556
-    yalevxq.schema: 1644509556
+    symbols_cantonese: 1645460514
+    yalevxq.schema: 1645460514
 engine:
   filters:
     - "simplifier@variants_hk"

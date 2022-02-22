@@ -1,13 +1,13 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1644509556
-    default.custom: 1644509556
+    default: 1645460514
+    default.custom: 1645460514
     jyut6ping3_10keys.custom: 0
-    jyut6ping3_10keys.schema: 1644509556
-    symbols: 1644509556
+    jyut6ping3_10keys.schema: 1645460514
+    symbols: 1645460514
     symbols.custom: 0
-    symbols_cantonese: 1644509556
+    symbols_cantonese: 1645460514
 engine:
   filters:
     - "simplifier@variants_hk"
@@ -340,8 +340,6 @@ simp_hk2s:
   option_name: simp_hk2s
 speller:
   algebra:
-    - "derive/^(?=[aeiou])/q/"
-    - "derive/^jy?([aeiou])/y$1/"
     - "derive/^jyu/ju/"
     - "derive/yu/y/"
     - "erase/y(ng|k)/"
@@ -350,17 +348,17 @@ speller:
     - "derive/eo/oe/"
     - "derive/oe/eo/"
     - "derive/aa(?=\\d)/a/"
-    - "derive/\\d//"
+    - "xform/\\d//"
     - "abbrev/^([a-z]).+$/$1/"
     - "xform/[a-c]/A/"
-    - "xform/[d-f]/B/"
-    - "xform/[g-i]/C/"
-    - "xform/[j-l]/D/"
-    - "xform/[m-o]/E/"
-    - "xform/[p-s]/F/"
-    - "xform/[t-v]/G/"
-    - "xform/[w-z]/H/"
-  alphabet: zyxwvutsrqponmlkjihgfedcba654321ABCDEFGH
+    - "xform/[d-f]/D/"
+    - "xform/[g-i]/G/"
+    - "xform/[j-l]/J/"
+    - "xform/[m-o]/M/"
+    - "xform/[p-s]/P/"
+    - "xform/[t-v]/T/"
+    - "xform/[w-z]/W/"
+  alphabet: zyxwvutsrqponmlkjihgfedcba654321ADGJMPTW
   delimiter: " '"
 switches:
   - name: ascii_mode
