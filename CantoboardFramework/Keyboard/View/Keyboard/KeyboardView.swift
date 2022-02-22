@@ -11,6 +11,8 @@ import UIKit
 import CocoaLumberjackSwift
 import ISEmojiView
 
+let kLanuageButtonClicked:String = "language_button_click"
+
 class KeyboardView: UIView, BaseKeyboardView {
     // Uncomment this to debug memory leak.
     private let c = InstanceCounter<KeyboardView>()

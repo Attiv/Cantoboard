@@ -319,6 +319,7 @@ class CandidatePaneView: UIControl {
         }
         
         layoutButtons()
+//        NotificationCenter.default.post(name: NSNotification.Name(rawValue: kLanuageButtonClicked), object: nil)
     }
     
     private func handleStatusMenu(from: UIView, with: UIEvent?) -> Bool {

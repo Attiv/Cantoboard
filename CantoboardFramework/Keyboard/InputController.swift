@@ -143,6 +143,11 @@ class InputController: NSObject {
         candidateOrganizer = CandidateOrganizer(inputController: self)
         
         refreshInputSettings()
+        NotificationCenter.default.addObserver(self, selector: #selector(clearInput), name: NSNotification.Name(rawValue: kLanuageButtonClicked), object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func prepare() {
@@ -468,6 +473,9 @@ class InputController: NSObject {
             if (state.mainSchema == .stroke || state.mainSchema.is10Keys) {
                 clearInput()
             }
+            if (state.mainSchema == .yinxing) {
+                clearInput()
+            }
             
             state.inputMode = toInputMode
         case .toggleSymbolShape:
@@ -546,8 +554,14 @@ class InputController: NSObject {
     }
     
     func refreshInputSettings() {
-        if Settings.cached.isMixedModeEnabled && state.inputMode == .chinese { state.inputMode = .mixed }
-        if !Settings.cached.isMixedModeEnabled && state.inputMode == .mixed { state.inputMode = .chinese }
+        if Settings.cached.isMixedModeEnabled && state.inputMode == .chinese {
+            state.inputMode = .mixed
+            
+        }
+        if !Settings.cached.isMixedModeEnabled && state.inputMode == .mixed {
+            state.inputMode = .chinese
+            
+        }
         
         isImmediateMode = state.inputMode == .english || Settings.cached.compositionMode == .immediate
         if isImmediateMode {
@@ -615,7 +629,7 @@ class InputController: NSObject {
         clearInput(shouldLeaveReverseLookupMode: shouldLeaveReverseLookupMode)
     }
     
-    private func clearInput(shouldLeaveReverseLookupMode: Bool = true) {
+    @objc private func clearInput(shouldLeaveReverseLookupMode: Bool = true) {
         inputEngine.clearInput()
         if shouldLeaveReverseLookupMode {
             state.reverseLookupSchema = nil
