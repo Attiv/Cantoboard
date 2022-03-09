@@ -130,7 +130,7 @@ recognizer:
     expression: "^=.*$"
 
 menu:
-  page_size: 5
+  page_size: 50000
 
 style:
   horizontal: false

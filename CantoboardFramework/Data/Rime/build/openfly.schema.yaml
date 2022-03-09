@@ -77,7 +77,7 @@ key_binder:
     - {accept: "Release+comma", send: comma, when: composing}
   import_preset: default
 menu:
-  page_size: 5
+  page_size: 500
 punctuator:
   full_shape:
     " ": {commit: "　"}

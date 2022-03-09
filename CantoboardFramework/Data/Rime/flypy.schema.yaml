@@ -162,7 +162,7 @@ recognizer:
     punct: ""
 
 menu:
-  page_size: 5 #候选项数
+  page_size: 500 #候选项数
   
 style:
   horizontal: true #竖排为false

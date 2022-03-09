@@ -57,7 +57,7 @@ key_binder:
     - {accept: "Control+period", toggle: ascii_punct, when: always}
   import_preset: default
 menu:
-  page_size: 10
+  page_size: 50000
 punctuator:
   full_shape:
     " ": {commit: "　"}
