@@ -32,7 +32,7 @@ class CommonContextualKeys {
     static func getContextualKeys(key: ContextualKey, keyboardState: KeyboardState) -> KeyCap? {
         switch key {
         case .symbol:
-            let keyHint = "符"
+            let keyHint = KeyCapHints(rightHint: "符")
             switch keyboardState.keyboardContextualType {
 //             case .chinese: return .character("，", keyHint, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
             // case .english: return .character(",", keyHint, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
@@ -45,13 +45,13 @@ class CommonContextualKeys {
                 if (keyboardState.isComposing) {
                     children.append(KeyCap(rime: .delimiter))
                 }
-                return .character(".", "/", nil, children)
+                return .character(".", KeyCapHints(rightHint: "/"), children)
             }
         case ",": return keyboardState.keyboardContextualType.halfWidthSymbol ? "," : "，"
         case ".": return keyboardState.keyboardContextualType.halfWidthSymbol ? "." : "。"
         case .url: // For iPads
             let domains = [".net", ".org", ".edu", ".com", String("." + SessionState.main.localDomain), ".hk", ".tw", ".mo", ".cn", ".uk", ".jp"].unique()
-            return .character(".com", nil, nil, domains.map{ .character($0, nil, nil, nil) })
+            return .character(".com", nil, domains.map{ .character($0, nil, nil) })
         default: return nil
         }
     }
@@ -62,7 +62,7 @@ class CommonSwipeDownKeys {
         let isInChineseContextualMode = !keyboardState.keyboardContextualType.halfWidthSymbol
         let keyCapCharacter: String?
         switch keyCap {
-        case .character(let c, _, _, _), .cangjie(let c, _): keyCapCharacter = c.lowercased()
+        case .character(let c, _, _), .cangjie(let c, _, _): keyCapCharacter = c.lowercased()
         case .currency: keyCapCharacter = "$"
         case .singleQuote: keyCapCharacter = "'"
         case .doubleQuote: keyCapCharacter = "\""
@@ -81,10 +81,10 @@ class CommonSwipeDownKeys {
         case "p": return "0"
         case "a": return "@"
         case "s": return "#"
-        case "d": return .currency
-        case "f": return isInChineseContextualMode ? "／" : "/"
-        case "g": return isInChineseContextualMode ? "（" : "("
-        case "h": return isInChineseContextualMode ? "）" : ")"
+        case "d": return KeyCap(SessionState.main.currencySymbol)
+        case "f": return KeyCap("/").symbolTransform(state: keyboardState)
+        case "g": return KeyCap("(").symbolTransform(state: keyboardState)
+        case "h": return KeyCap(")").symbolTransform(state: keyboardState)
         case "j": return "「"
         case "k": return "」"
         case "l": return .singleQuote
@@ -94,7 +94,7 @@ class CommonSwipeDownKeys {
         case "v": return isInChineseContextualMode ? "⋯" : "…"
         case "b": return isInChineseContextualMode ? "、" : "､"
         case "n": return isInChineseContextualMode ? "；" : ";"
-        case "m": return isInChineseContextualMode ? "：" : ":"
+        case "m": return KeyCap(":").symbolTransform(state: keyboardState)
         case ",": return "!"
         case ".": return "?"
         case "，": return "！"

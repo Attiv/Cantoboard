@@ -76,6 +76,10 @@ struct KeyboardState: Equatable {
     var filters: [String]?
     var selectedFilterIndex: Int?
     
+    var showCommonSwipeDownKeysInLongPress: Bool {
+        keyboardIdiom == .phone && Settings.cached.isLongPressSymbolKeysEnabled
+    }
+    
     init() {
         keyboardType = KeyboardType.alphabetic(.lowercased)
         lastKeyboardTypeChangeFromAutoCap = false
@@ -1047,7 +1051,7 @@ class InputController: NSObject {
     private func refreshKeyboardContextualType() {
         guard let textDocumentProxy = textDocumentProxy else { return }
         let symbolShape = Settings.cached.symbolShape
-
+        
         if textDocumentProxy.keyboardType == .URL || textDocumentProxy.keyboardType == .webSearch {
             state.keyboardContextualType = .url
             return
@@ -1056,7 +1060,7 @@ class InputController: NSObject {
             case .smart:
                 switch state.inputMode {
                 case .chinese: state.keyboardContextualType = .chinese
-                case .english where !Settings.cached.isMixedModeEnabled: state.keyboardContextualType = .english
+                case .english: state.keyboardContextualType = .english
                 default:
                     let isEnglish = isUserTypingEnglish(documentContextBeforeInput: documentContextBeforeInput)
                     state.keyboardContextualType = isEnglish ? .english : .chinese
@@ -1107,7 +1111,6 @@ class InputController: NSObject {
     
     private func showAutoSuggestCandidates() {
         let textBeforeInput = documentContextBeforeInput
-        let textAfterInput = documentContextAfterInput
         
         var newAutoSuggestionType: AutoSuggestionType?
         
@@ -1136,26 +1139,10 @@ class InputController: NSObject {
         }
         
         switch state.keyboardContextualType {
-        case .english where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
-            newAutoSuggestionType = .halfWidthPunctuation
-        case .chinese where !lastCharBefore.isNumber && lastCharBefore.isLetter && textAfterInput.isEmpty:
-            newAutoSuggestionType = .fullWidthPunctuation
-        default:
-            if lastCharBefore.isNumber {
-                if lastCharBefore.isASCII && !Settings.cached.enableNumKeyRow {
-                    newAutoSuggestionType = .halfWidthDigit
-                } else {
-                    switch lastCharBefore {
-                    case "０", "１", "２", "３", "４", "５", "６", "７", "８", "９":
-                        newAutoSuggestionType = .fullWidthArabicDigit
-                    case "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "零", "廿", "百", "千", "萬", "億":
-                        newAutoSuggestionType = .fullWidthLowerDigit
-                    case "壹", "貳", "叄", "肆", "伍", "陸", "柒", "捌", "玖", "拾", "佰", "仟":
-                        newAutoSuggestionType = .fullWidthUpperDigit
-                    default: ()
-                    }
-                }
-            }
+        case .english: newAutoSuggestionType = .halfWidthPunctuation
+        case .chinese: newAutoSuggestionType = .fullWidthPunctuation
+        case .url: newAutoSuggestionType = .domain
+        default: ()
         }
     }
 }
