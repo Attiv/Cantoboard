@@ -37,8 +37,8 @@ class CommonContextualKeys {
 //             case .chinese: return .character("，", keyHint, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
             // case .english: return .character(",", keyHint, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
             // case .rime: return .rime(.delimiter, keyHint, [KeyCap(rime: .delimiter), "`", ".", ",", "?", "!"])
-            case .chinese: return .character("，", keyHint, nil, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
-            case .english: return .character(",", keyHint, nil, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
+            case .chinese: return .character("，", keyHint, ["。", "，", "？", "！", "、", ".", ",","`", KeyCap(rime: .sym)])
+            case .english: return .character(",", keyHint, [".", ",", "?", "!", "。", "，", KeyCap(rime: .sym)])
             case .rime: return .rime(.delimiter, keyHint, [KeyCap(rime: .delimiter), "`", ".", ",", "?", "!"])
             case .url:
                 var children: [KeyCap] = ["/", ".", ".com", ".net", ".org", ".edu"]
@@ -88,7 +88,7 @@ class CommonSwipeDownKeys {
         case "j": return "「"
         case "k": return "」"
         case "l": return .singleQuote
-        case "z": return "%"
+        case "z": return "`"
         case "x": return isInChineseContextualMode ? "—" : "-"
         case "c": return isInChineseContextualMode ? "～" : "~"
         case "v": return isInChineseContextualMode ? "⋯" : "…"
