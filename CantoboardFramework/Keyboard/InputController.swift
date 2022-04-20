@@ -139,6 +139,46 @@ class InputController: NSObject {
         compositionRenderer.textAfterInput
     }
     
+    @objc func swipeUpNotify(notify: Notification) {
+        let c = notify.userInfo?["value"] as! String
+        guard let textDocumentProxy = textDocumentProxy else { return }
+        guard let char = c.first else { return }
+        let isComposing = inputEngine.isComposing
+        var hasMutatedComposition = false
+        if !isComposing && shouldApplyChromeSearchBarHack {
+            // To clear out the current url selected in Chrome address bar.
+            // This shouldn't have any side effects in other apps.
+            textDocumentProxy.insertText("")
+        }
+        var shouldFeedCharToInputEngine = false
+        if (inputEngine.rimeSchema.isVitta) {
+            shouldFeedCharToInputEngine = (char == "`") || (char.isEnglishLetter && c.count == 1)
+        } else {
+            shouldFeedCharToInputEngine = char.isEnglishLetter && c.count == 1
+        }
+        if !(shouldFeedCharToInputEngine && inputEngine.processChar(char)) {
+            if !insertComposingText(appendBy: c) {
+                insertText(c)
+            }
+        }
+        if !isHoldingShift && state.keyboardType == .some(.alphabetic(.uppercased)) {
+            state.keyboardType = .alphabetic(.lowercased)
+            state.lastKeyboardTypeChangeFromAutoCap = false
+        }
+        hasMutatedComposition = true
+        if needClearInput {
+            clearInput()
+        } else {
+            updateInputState()
+        }
+        if hasMutatedComposition {
+            state.filters = []
+            state.selectedFilterIndex = nil
+            candidateOrganizer.filterPrefix = nil
+        }
+        updateComposition()
+    }
+    
     init(keyboardViewController: KeyboardViewController) {
         super.init()
         
@@ -148,6 +188,7 @@ class InputController: NSObject {
         
         refreshInputSettings()
         NotificationCenter.default.addObserver(self, selector: #selector(clearInput), name: NSNotification.Name(rawValue: kLanuageButtonClicked), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(swipeUpNotify(notify:)), name: NSNotification.Name(rawValue: "swip-up"), object: nil);
     }
     
     deinit {
@@ -1146,6 +1187,7 @@ class InputController: NSObject {
         }
     }
 }
+
 
 extension InputController: KeyboardViewDelegate {
     func handleInputModeList(from: UIView, with: UIEvent) {

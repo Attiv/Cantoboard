@@ -56,6 +56,7 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
     }
     
     var selectedAction: KeyboardAction = .none
+    var lastAction: KeyboardAction = .none
     
     var hitTestFrame: CGRect?
     
@@ -111,8 +112,13 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
     
     init(layoutConstants: Reference<LayoutConstants>) {
         self.layoutConstants = layoutConstants
+        
         super.init(frame: .zero)
         setupUIButton()
+        
+        let swipeUpRecognizer = UISwipeGestureRecognizer.init(target: self, action: #selector(swipeUp(swipe:)))
+        swipeUpRecognizer.direction = .up
+        self.addGestureRecognizer(swipeUpRecognizer)
     }
     
     override public class var layerClass: AnyClass {
@@ -477,6 +483,7 @@ extension KeyView {
         if let popupView = popupView {
             popupView.updateSelectedAction(touch)
             selectedAction = popupView.selectedAction
+//            lastAction = popupView.selectedAction
         }
     }
     
@@ -498,6 +505,7 @@ extension KeyView {
             swipeDownPercentage = 0
         }
         
+
         removePopup()
     }
     
@@ -568,6 +576,7 @@ extension KeyView {
         defaultKeyCapIndex = keyCaps.firstIndex(where: { $0.buttonText == defaultChildKeyCapTitle }) ?? 0
         popupView.setup(keyCaps: keyCaps, defaultKeyCapIndex: defaultKeyCapIndex, direction: popupDirection)
         selectedAction = popupView.selectedAction
+//        lastAction = popupView.selectedAction
         
         isPopupInLongPressMode = isLongPress
         setupView()
@@ -610,6 +619,17 @@ extension KeyView {
             return keyCap.childrenKeyCaps
         } else {
             return [keyCap]
+        }
+    }
+    
+    @objc func swipeUp(swipe: UISwipeGestureRecognizer) {
+        guard let keyboardState = keyboardState else { return }
+        if (keyCap.buttonRightHint != "符") {
+            let  defaultChildKeyCapTitle = CommonSwipeDownKeys.getSwipeDownKeyCapForPadShortOrFull4Rows(keyCap: keyCap, keyboardState: keyboardState)?.buttonText ?? keyCap.defaultChildKeyCapTitle
+            print(defaultChildKeyCapTitle)
+          
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "swip-up"), object: nil, userInfo: ["value": defaultChildKeyCapTitle])
+            
         }
     }
 }

@@ -394,7 +394,7 @@ class TouchHandler {
         keyRepeatTimer = nil
     }
     
-    private func callKeyHandler(_ keyView: KeyView?, _ action: KeyboardAction) {
+     func callKeyHandler(_ keyView: KeyView?, _ action: KeyboardAction) {
         guard let delegate = keyboardView?.delegate else { return }
         if let keyView = keyView {
             keyView.dispatchKeyAction(action, delegate)

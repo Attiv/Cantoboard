@@ -21,7 +21,7 @@ class KeyPopupView: UIView {
     }
     
     private(set) var keyCaps: [KeyCap] = []
-    private var actions: [KeyboardAction] = []
+    var actions: [KeyboardAction] = []
     private var shapeLayer: CAShapeLayer!
     private var keyWidth: CGFloat = 0
     private var direction: PopupDirection = .middle
@@ -30,7 +30,7 @@ class KeyPopupView: UIView {
     private var collectionView: UICollectionView?
     private(set) var leftAnchorX: CGFloat = 0
     private var defaultKeyCapIndex = 0
-    private var highlightedLabelIndex: Int?
+    var highlightedLabelIndex: Int?
     private var layoutConstants: Reference<LayoutConstants>
     
     var selectedAction: KeyboardAction {

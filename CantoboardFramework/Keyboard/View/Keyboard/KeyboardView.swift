@@ -70,6 +70,7 @@ class KeyboardView: UIView, BaseKeyboardView {
         createCandidatePaneView()
         
         setupView()
+//        NotificationCenter.default.addObserver(self, selector: #selector(swipeUpNotify(notify:)), name: NSNotification.Name(rawValue: "swip-up"), object: nil);
     }
     
     public override func didMoveToSuperview() {
@@ -591,5 +592,13 @@ extension KeyboardView: EmojiViewDelegate {
     
     func emojiViewDidPressDeleteBackwardButton(_ emojiView: EmojiView) {
         delegate?.handleKey(.backspace)
+    }
+    
+    @objc func swipeUpNotify(notify: Notification) {
+        let action = notify.userInfo?["action"] as! KeyboardAction
+        let keyView = notify.userInfo?["keyView"] as! KeyView
+        
+        touchHandler?.callKeyHandler(keyView, action)
+        
     }
 }
