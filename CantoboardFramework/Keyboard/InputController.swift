@@ -26,6 +26,16 @@ indirect enum ContextualType: Equatable {
     }
 }
 
+class CangjieConstants {
+    private static let cangjieKeyCapsByAscii = ["日", "月", "金", "木", "水", "火", "土", "竹", "戈", "十", "大", "中", "一", "弓", "人", "心", "手", "口", "尸", "廿", "山", "女", "田", "難", "卜", "符"]
+    
+    static func cangjieKeyCaps(_ c: String) -> String {
+        guard let asciiCode = c.lowercased().first?.asciiValue else { return c }
+        let letterIndex = Int(asciiCode) - Int("a".first!.asciiValue!)
+        return Self.cangjieKeyCapsByAscii[safe: letterIndex] ?? c
+    }
+}
+
 struct KeyboardState: Equatable {
     var keyboardType: KeyboardType {
         didSet {
@@ -516,7 +526,14 @@ class InputController: NSObject {
             }
             
             if (state.mainSchema == .stroke || state.mainSchema.is10Keys) {
-                clearInput()
+                let hasCandidate = isComposing && candidateOrganizer.getCandidateCount(section: 0) > 0
+                if (state.inputMode == .english) {
+                    _ = insertComposingText(shouldDisableSmartSpace: true)
+                } else if hasCandidate {
+                    candidateSelected(choice: [0, 0], enableSmartSpace: false)
+                } else {
+                    clearInput()
+                }
             }
             if (state.mainSchema == .yinxing) {
                 clearInput()
@@ -826,7 +843,7 @@ class InputController: NSObject {
             
             let cc = candidateCode[cIndex]
             
-            // NSLog("UFO iteration \(ic) \(cc)")
+            // DDLogInfo("UFO iteration \(ic) \(cc)")
             if cc == " " {
                 // If the candidate code is a space, append.
                 if ic == "'" {
@@ -862,7 +879,7 @@ class InputController: NSObject {
         }
         
         let selectedInput = rimeCompositionText.prefix(rimeCompositionText.count - inputRemaining.count)
-        //NSLog("UFO selectedInput \(selectedInput)")
+        // DDLogInfo("UFO selectedInput \(selectedInput)")
         
         let composition = String(selectedInput + morphedInput)
         let inputCaretPosFromTheRight = rimeComposition.text.count - rimeComposition.caretIndex
@@ -893,7 +910,7 @@ class InputController: NSObject {
                 iIndex = inputRemaining.index(after: iIndex)
             }
             guard !filter.isEmpty && !filterSet.contains(filter) else { return nil }
-            // NSLog("UFO \(inputRemaining) \(prefix) \(filter)")
+            // DDLogInfo("UFO \(inputRemaining) \(prefix) \(filter)")
             filterSet.insert(filter)
             return filter
         }
@@ -911,22 +928,16 @@ class InputController: NSObject {
         }
         
         switch state.inputMode {
-        case .chinese: updateComposition(inputEngine.composition)
+        case .chinese, .mixed: updateComposition(inputEngine.composition)
         case .english: updateComposition(inputEngine.englishComposition)
-        case .mixed:
-            if state.activeSchema.isCangjieFamily {
-                // Show both Cangjie radicals and english composition in marked text.
-                // let composition = inputEngine.rimeComposition
-                // composition?.text += " " + (inputEngine.englishComposition?.text ?? "")
-                // updateComposition(composition)
-                updateComposition(inputEngine.englishComposition)
-            } else {
-                updateComposition(inputEngine.composition)
-            }
         }
         
         if state.activeSchema.isCangjieFamily && state.inputMode != .english {
-            keyboardViewController?.compositionLabelView?.composition = inputEngine.rimeComposition
+            let composition = inputEngine.rimeComposition
+            composition?.text = composition?.text.map({ c in
+                CangjieConstants.cangjieKeyCaps(String(c))
+            }).joined() ?? ""
+            keyboardViewController?.compositionLabelView?.composition = composition
         } else if state.inputMode == .english {
             keyboardViewController?.compositionLabelView?.composition = inputEngine.englishComposition
         } else {
@@ -1097,6 +1108,7 @@ class InputController: NSObject {
             state.keyboardContextualType = .url
             return
         } else {
+            state.specialSymbolShapeOverride.removeAll()
             switch symbolShape {
             case .smart:
                 switch state.inputMode {
@@ -1105,14 +1117,14 @@ class InputController: NSObject {
                 default:
                     let isEnglish = isUserTypingEnglish(documentContextBeforeInput: documentContextBeforeInput)
                     state.keyboardContextualType = isEnglish ? .english : .chinese
+                    
+                    for specialSymbol in SpecialSymbol.allCases {
+                        let symbolShape = specialSymbol.determineSymbolShape(textBefore: documentContextBeforeInput)
+                        state.specialSymbolShapeOverride[specialSymbol] = symbolShape
+                    }
                 }
             case .half: state.keyboardContextualType = .english
             case .full: state.keyboardContextualType = .chinese
-            }
-            
-            for specialSymbol in SpecialSymbol.allCases {
-                let symbolShape = specialSymbol.determineSymbolShape(textBefore: documentContextBeforeInput)
-                state.specialSymbolShapeOverride[specialSymbol] = symbolShape
             }
         }
         if inputEngine.isComposing {

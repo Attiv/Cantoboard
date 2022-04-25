@@ -138,7 +138,9 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
         let hasStateChanged = keyboardState == nil ||
             keyboardState?.keyboardIdiom != newState.keyboardIdiom ||
             keyboardState?.isPortrait != newState.isPortrait ||
-            keyboardState?.isKeyboardAppearing != newState.isKeyboardAppearing
+            keyboardState?.isKeyboardAppearing != newState.isKeyboardAppearing ||
+            keyboardState?.keyboardType != newState.keyboardType || // Refresh top num key rows on iPad Pro 5 rows layout to hide swipe down key.
+            self.isPadTopRowButton != isPadTopRowButton
         guard keyCap != self.keyCap || hasStateChanged else { return }
         
         self.keyCap = keyCap
@@ -175,7 +177,7 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
         
         var maskedCorners: CACornerMask = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner]
         var shadowOpacity: Float = 1.0
-        let buttonLeftHintTitle = keyCap.buttonLeftHint
+        var buttonLeftHintTitle = keyCap.buttonLeftHint
         var buttonBottomHintTitle = keyCap.buttonBottomHint
         var buttonRightHintTitle = keyCap.buttonRightHint
         var setHighlightedBackground = false
@@ -191,6 +193,7 @@ class KeyView: HighlightableButton, CAAnimationDelegate {
             }
             shadowOpacity = 0
             buttonBottomHintTitle = nil
+            buttonLeftHintTitle = nil
             buttonRightHintTitle = nil
         } else if popupView != nil && keyboardIdiom == .phone {
             backgroundColor = ButtonColor.popupBackgroundColor
