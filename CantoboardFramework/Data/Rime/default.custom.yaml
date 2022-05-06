@@ -1,6 +1,7 @@
 patch:
   schema_list:
   - schema: openfly
+  - schema: xkjd6
   - schema: xhup
   - schema: xhup_express
   - schema: double_pinyin_flypy

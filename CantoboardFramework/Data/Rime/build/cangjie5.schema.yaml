@@ -2,12 +2,12 @@ __build_info:
   rime_version: 1.7.3
   timestamps:
     cangjie5.custom: 0
-    cangjie5.schema: 1650775571
-    default: 1650775572
-    default.custom: 1650775571
-    symbols: 1650775572
+    cangjie5.schema: 1651247051
+    default: 1651247052
+    default.custom: 1651247051
+    symbols: 1651247052
     symbols.custom: 0
-    symbols_cantonese: 1650775571
+    symbols_cantonese: 1651247051
 engine:
   filters:
     - uniquifier

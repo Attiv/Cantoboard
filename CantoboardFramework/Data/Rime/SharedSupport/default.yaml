@@ -16,6 +16,7 @@ schema_list:
   - schema: flypy
   - schema: jyutping
   - schema: quick5
+  - schema: xkjd6
   - schema: xqjz
   - schema: xqzm
   - schema: jiugong

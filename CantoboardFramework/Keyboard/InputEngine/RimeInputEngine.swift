@@ -22,7 +22,8 @@ public enum RimeSchema: String, Codable {
     case stroke = "stroke"
     case loengfan = "loengfan"
     case yinxing = "openfly"
-    case wubi = "wubi86_jidian"
+//    case wubi = "wubi86_jidian"
+    case wubi = "xkjd6"
     case jyutping10keys = "jyut6ping3_10keys"
     
     var signChar: String {
@@ -38,7 +39,8 @@ public enum RimeSchema: String, Codable {
         case .mandarin: return "拼"
         case .stroke: return "筆"
         case .yinxing: return "音"
-        case .wubi: return "五"
+//        case .wubi: return "五"
+        case .wubi: return "星"
         case .jyutping10keys: return "粵"
         }
     }
@@ -55,7 +57,8 @@ public enum RimeSchema: String, Codable {
         case .mandarin: return "拼音"
         case .stroke: return "筆劃"
         case .yinxing: return "音形"
-        case .wubi: return "五笔"
+//        case .wubi: return "五笔"
+        case .wubi: return "键道6"
         case .jyutping10keys: return "粵格"
         }
     }

@@ -1,8 +1,8 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1645460514
-    default.custom: 1645460514
+    default: 1651247052
+    default.custom: 1651247051
 ascii_composer:
   switch_key:
     Control_L: noop
@@ -38,7 +38,7 @@ key_binder:
     - {accept: "Shift+space", toggle: full_shape, when: always}
     - {accept: "Control+period", toggle: ascii_punct, when: always}
 menu:
-  page_size: 50000 # The most common JyutPing "zi" maps to 409 chars.
+  page_size: 10
 punctuator:
   full_shape:
     " ": {commit: "　"}
@@ -114,6 +114,7 @@ recognizer:
     url: "^(www[.]|https?:|ftp:|mailto:).*$|^[a-z]+[.].+$"
 schema_list:
   - schema: openfly
+  - schema: xkjd6
   - schema: xhup
   - schema: xhup_express
   - schema: double_pinyin_flypy

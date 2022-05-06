@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1645460514
-    default.custom: 1645460514
-    openfly.custom: 1645460514
-    openfly.schema: 1645460514
+    default: 1651247052
+    default.custom: 1651247051
+    openfly.custom: 1651247051
+    openfly.schema: 1651247051
 engine:
   filters:
     - "lua_filter@openfly_hint_filter"
@@ -77,7 +77,7 @@ key_binder:
     - {accept: "Release+comma", send: comma, when: composing}
   import_preset: default
 menu:
-  page_size: 500
+  page_size: 50000
 punctuator:
   full_shape:
     " ": {commit: "　"}
