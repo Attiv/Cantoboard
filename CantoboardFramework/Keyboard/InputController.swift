@@ -183,11 +183,11 @@ class InputController: NSObject {
         } else {
             updateInputState()
         }
-        if hasMutatedComposition {
-            state.filters = []
-            state.selectedFilterIndex = nil
-            candidateOrganizer.filterPrefix = nil
-        }
+//        if hasMutatedComposition {
+//            state.filters = []
+//            state.selectedFilterIndex = nil
+//            candidateOrganizer.filterPrefix = nil
+//        }
         updateComposition()
     }
     
@@ -432,7 +432,7 @@ class InputController: NSObject {
             } else {
                 _ = inputEngine.processRimeChar(rc.rawValue)
             }
-            hasMutatedComposition = true
+//            hasMutatedComposition = true
             // We have a special case for 10 keys input mode.
             // We have to store delimiters have to keep track of the original user input in EnglishInputEngine.
             // We use the original user input for 10 keys candidate specialization.
