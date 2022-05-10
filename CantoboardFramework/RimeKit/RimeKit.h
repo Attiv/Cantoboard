@@ -3,10 +3,14 @@
 
 #import <Foundation/Foundation.h>
 
+typedef uintptr_t RimeSessionId;
+
 NS_SWIFT_NAME(RimeSession)
 @interface RKRimeSession: NSObject
 
 -(void)processKey:(int)keycode modifier:(int)modifier;
+-(void)setCaretPos:(size_t) caretPos;
+-(void)resetAndUpdateContext;
 
 -(NSString *)getCandidate:(unsigned int) index;
 -(NSString *)getComment:(unsigned int) index;
@@ -27,6 +31,7 @@ NS_SWIFT_NAME(RimeSession)
 @property int compositionCaretBytePosition, rawInputCaretBytePosition;
 @property bool isFirstCandidateCompleteMatch;
 @property (readonly, strong) NSString *compositionText, *commitTextPreview, *rawInput;
+@property (readonly) RimeSessionId sessionId;
 
 @end
 
