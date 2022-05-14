@@ -72,7 +72,7 @@ translator:
   dictionary: openfly
   enable_charset_filter: false
   enable_sentence: false
-  enable_completion: true
+  enable_completion: false
   enable_user_dict: false
   disable_user_dict_for_patterns:
     - "^z.*$"
@@ -130,7 +130,7 @@ recognizer:
     expression: "^=.*$"
 
 menu:
-  page_size: 50000
+  page_size: 5
 
 style:
   horizontal: false

@@ -4,12 +4,12 @@ EN2en:
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1651247052
-    default.custom: 1651247051
-    symbols: 1651247052
+    default: 1652537759
+    default.custom: 1652537758
+    symbols: 1652537759
     symbols.custom: 0
     xkjd6.custom: 0
-    xkjd6.schema: 1651247052
+    xkjd6.schema: 1652537759
 ascii_punct:
   option_name: ascii_punct
 bmms:
@@ -94,6 +94,8 @@ key_binder:
   bindings:
     - {accept: minus, send: Page_Up, when: has_menu}
     - {accept: equal, send: Page_Down, when: has_menu}
+    - {accept: comma, send: Page_Up, when: has_menu}
+    - {accept: period, send: Page_Down, when: has_menu}
     - {accept: F7, toggle: jffh, when: always}
     - {accept: "Control+period", toggle: ascii_punct, when: always}
     - {accept: semicolon, send: 2, when: has_menu}
@@ -132,7 +134,7 @@ layout:
     topup_this: bcdefghjklmnpqrstwxyz
     topup_with: "avuio;"
 menu:
-  page_size: 10
+  page_size: 6
 pinyin_simp:
   dictionary: pinyin_simp
   enable_completion: true
@@ -400,7 +402,7 @@ speller:
     - "derive/^([bcdefghjklmnpqrstwxyz;`]{2}[avuio`]{5}).$/$1`/"
     - "derive/^[bcdefghjklmnpqrstwxyz;]{2}([avuio`]*)$/``$1/"
   alphabet: "zyxwvutsrqponmlkjihgfedcba;/=`"
-  auto_select: true
+  auto_select: false
   auto_select_unique_candidate: true
   initials: "abcdefghijklmnopqrstuvwxyz;/=`"
 switches:
