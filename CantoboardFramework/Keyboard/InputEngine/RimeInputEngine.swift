@@ -78,7 +78,7 @@ public enum RimeSchema: String, Codable {
     }
     
     var isVitta: Bool {
-        self == .yinxing
+        self == .yinxing || self == .wubi
     }
     
     var isCangjieFamily: Bool {
