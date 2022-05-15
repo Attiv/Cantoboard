@@ -1,17 +1,17 @@
-﻿# Rime schema settings
-# encoding: utf-8
-
-schema:
-  schema_id: xkjd6cx
-  name: 键道6反查
-  version: "1"
-
-switches:
-  - name: ascii_mode
-    reset: 0
-    states: [ 中文, 西文 ]
-    
+__build_info:
+  rime_version: 1.7.3
+  timestamps:
+    default: 1613228859
+    default.custom: 1651054080
+    key_bindings: 1631897798
+    key_bindings.custom: 0
+    punctuation: 1613228859
+    punctuation.custom: 0
+    xkjd6cx.custom: 0
+    xkjd6cx.schema: 1649221174
 engine:
+  filters:
+    - uniquifier
   processors:
     - ascii_composer
     - recognizer
@@ -31,24 +31,30 @@ engine:
     - punct_translator
     - table_translator
     - reverse_lookup_translator
-  filters:
-    - uniquifier
-
+menu:
+  page_size: 6
+schema:
+  name: "键道6反查"
+  schema_id: xkjd6cx
+  version: 1
 speller:
-  alphabet: 'zyxwvutsrqponmlkjihgfedcba;'
-  initials: 'abcdefghijklmnopqrstuvwxyz;'
-  delimiter: " '"
-  max_code_length: 6
-  auto_select: true
-  auto_select_pattern: ^;.$|^\w{6}$
   algebra:
-    - derive/^.(.*)$/`$1/
-    - derive/^(.).(.*)$/$1`$2/
-    - derive/^(..).(.*)$/$1`$2/
-    - derive/^(...).(.*)$/$1`$2/
-    - derive/^(....).(.*)$/$1`$2/
-    - derive/^(.....).$/$1`/
-
+    - "derive/^.(.*)$/`$1/"
+    - "derive/^(.).(.*)$/$1`$2/"
+    - "derive/^(..).(.*)$/$1`$2/"
+    - "derive/^(...).(.*)$/$1`$2/"
+    - "derive/^(....).(.*)$/$1`$2/"
+    - "derive/^(.....).$/$1`/"
+  alphabet: "zyxwvutsrqponmlkjihgfedcba;"
+  auto_select: true
+  auto_select_pattern: "^;.$|^\\w{6}$"
+  delimiter: " '"
+  initials: "abcdefghijklmnopqrstuvwxyz;"
+  max_code_length: 6
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: ["中文", "西文"]
 translator:
   dictionary: xkjd6cx
   enable_charset_filter: false

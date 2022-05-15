@@ -394,11 +394,13 @@ class InputController: NSObject {
         needReloadCandidates = true
         let isComposing = inputEngine.isComposing
         
+        
         switch action {
         case .moveCursorForward, .moveCursorBackward:
             moveCursor(offset: action == .moveCursorBackward ? -1 : 1)
         case .character(let c):
             guard let char = c.first else { return }
+            
             if !isComposing && shouldApplyChromeSearchBarHack {
                 // To clear out the current url selected in Chrome address bar.
                 // This shouldn't have any side effects in other apps.
@@ -560,7 +562,7 @@ class InputController: NSObject {
                     clearInput()
                 }
             }
-            if (state.mainSchema == .yinxing) {
+            if (inputEngine.rimeSchema.isVitta) {
                 clearInput()
             }
             
@@ -627,7 +629,7 @@ class InputController: NSObject {
         if needClearInput {
             clearInput()
         } else {
-            updateInputState()
+            updateInputState(action)
         }
         updateComposition()
     }
@@ -762,7 +764,7 @@ class InputController: NSObject {
         // DDLogInfo("insertText() hasInsertedAutoSpace \(hasInsertedAutoSpace) isLastInsertedTextFromCandidate \(isLastInsertedTextFromCandidate)")
     }
     
-    private func updateInputState() {
+    private func updateInputState(_ action: KeyboardAction? = nil) {
         guard state.isKeyboardAppearing else { return }
         
         updateContextualSuggestion()
@@ -791,6 +793,11 @@ class InputController: NSObject {
         if (state.inputMode != .english && text.count > 0) {
             insertText(text)
             clearInput()
+            if ((action) != nil && (state.mainSchema == .wubi)) {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+//                    self.handleKey(action!)
+//                }
+            }
         }
 //        DDLogInfo(text)
         
