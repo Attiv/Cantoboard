@@ -790,13 +790,15 @@ class InputController: NSObject {
         // keyboardView?.state = state
         keyboardViewController?.keyboardView?.state = state
         let text = rimeInputEngine!.getCommitedText()
+        DDLogInfo("VITTA -------------- " + text)
+        
         if (state.inputMode != .english && text.count > 0) {
             insertText(text)
             clearInput()
-            if ((action) != nil && (state.mainSchema == .wubi)) {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            if ((action) != nil) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
 //                    self.handleKey(action!)
-//                }
+                }
             }
         }
 //        DDLogInfo(text)
