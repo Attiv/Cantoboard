@@ -374,6 +374,7 @@ class InputController: NSObject {
     }
     
     func handleKey(_ action: KeyboardAction) {
+        var vt: String = "";
         guard RimeApi.shared.state == .succeeded else {
             // If RimeEngine isn't ready, disable the keyboard.
             DDLogInfo("Disabling keyboard")
@@ -400,7 +401,7 @@ class InputController: NSObject {
             moveCursor(offset: action == .moveCursorBackward ? -1 : 1)
         case .character(let c):
             guard let char = c.first else { return }
-            
+            vt = c
             if !isComposing && shouldApplyChromeSearchBarHack {
                 // To clear out the current url selected in Chrome address bar.
                 // This shouldn't have any side effects in other apps.
@@ -629,7 +630,7 @@ class InputController: NSObject {
         if needClearInput {
             clearInput()
         } else {
-            updateInputState(action)
+            updateInputState(action, vt: vt)
         }
         updateComposition()
     }
@@ -764,7 +765,7 @@ class InputController: NSObject {
         // DDLogInfo("insertText() hasInsertedAutoSpace \(hasInsertedAutoSpace) isLastInsertedTextFromCandidate \(isLastInsertedTextFromCandidate)")
     }
     
-    private func updateInputState(_ action: KeyboardAction? = nil) {
+    private func updateInputState(_ action: KeyboardAction? = nil, vt: String? = nil) {
         guard state.isKeyboardAppearing else { return }
         
         updateContextualSuggestion()
@@ -790,16 +791,28 @@ class InputController: NSObject {
         // keyboardView?.state = state
         keyboardViewController?.keyboardView?.state = state
         let text = rimeInputEngine!.getCommitedText()
-        DDLogInfo("VITTA -------------- " + text)
         
         if (state.inputMode != .english && text.count > 0) {
+    
+       
+           
             insertText(text)
             clearInput()
-            if ((action) != nil) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-//                    self.handleKey(action!)
-                }
+            if (nil != vt && vt != "") {
+//                guard let char = vt!.first else { return }
+                
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                
+//                    self.inputEngine.processChar(char)
+//                }
+            
             }
+            
+//            if ((action) != nil) {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+//                    self.handleKey(action!)
+//                }
+//            }
         }
 //        DDLogInfo(text)
         
