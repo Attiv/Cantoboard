@@ -55,12 +55,7 @@ class CandidatePaneView: UIControl {
                 prevState.symbolShape != newState.symbolShape ||
                 prevState.enableState != newValue.enableState
             
-            if newValue.enableState == .enabled {
-                isShowingNumKeyRow = false
-            }
-            
             _keyboardState = newValue
-            numKeyRow.keyboardState = newValue
             
             if isViewDirty {
                 setupButtons()
@@ -156,22 +151,6 @@ class CandidatePaneView: UIControl {
     private(set) var mode: Mode = .row
     private var shouldPreserveCandidateOffset: Bool = false
     
-    private var numKeyRow: NumKeyRow
-    private var _isShowingNumKeyRow: Bool = false
-    private var isShowingNumKeyRow: Bool {
-        get { _isShowingNumKeyRow }
-        set {
-            if _isShowingNumKeyRow != newValue {
-                if newValue {
-                    addSubview(numKeyRow)
-                } else {
-                    numKeyRow.removeFromSuperview()
-                }
-                _isShowingNumKeyRow = newValue
-            }
-        }
-    }
-    
     var statusIndicatorMode: StatusIndicatorMode {
         get {
             if keyboardState.keyboardType == .numeric ||
@@ -198,8 +177,6 @@ class CandidatePaneView: UIControl {
     init(keyboardState: KeyboardState, layoutConstants: Reference<LayoutConstants>) {
         _keyboardState = keyboardState
         self.layoutConstants = layoutConstants
-        
-        numKeyRow = NumKeyRow(keyboardState: keyboardState, layoutConstants: layoutConstants)
         
         super.init(frame: .zero)
         
@@ -260,6 +237,7 @@ class CandidatePaneView: UIControl {
         let expandButtonImage = mode == .row ? ButtonImage.paneExpandButtonImage : ButtonImage.paneCollapseButtonImage
         expandButton.setImage(adjustImageFontSize(expandButtonImage), for: .normal)
         expandButton.shouldShowMenuIndicator = mode == .row
+        expandButton.isEnabled = keyboardState.enableState == .enabled
         
         var title: String?
         var shouldShowMiniIndicator = false
@@ -279,9 +257,11 @@ class CandidatePaneView: UIControl {
         }
         inputModeButton.setTitle(title, for: .normal)
         inputModeButton.shouldShowMenuIndicator = shouldShowMiniIndicator && mode == .row
+        inputModeButton.isEnabled = keyboardState.enableState == .enabled
 
         backspaceButton.setImage(adjustImageFontSize(ButtonImage.backspace), for: .normal)
         backspaceButton.setImage(adjustImageFontSize(ButtonImage.backspaceFilled), for: .highlighted)
+        backspaceButton.isEnabled = keyboardState.enableState == .enabled
         
         var charFormText: String
         if SessionState.main.lastCharForm == .simplified {
@@ -290,6 +270,7 @@ class CandidatePaneView: UIControl {
             charFormText = "繁"
         }
         charFormButton.setTitle(charFormText, for: .normal)
+        charFormButton.isEnabled = keyboardState.enableState == .enabled
         
         if mode == .table {
             expandButton.isHidden = false
@@ -427,15 +408,7 @@ class CandidatePaneView: UIControl {
             collectionView.frame = collectionViewFrame
             collectionView.collectionViewLayout.invalidateLayout()
         }
-        if numKeyRow.superview != nil {
-            let numKeyRowHeight = height - 2 * StatusButton.statusInset // min(layoutConstants.ref.keyHeight, height - StatusButton.statusInset)
-            numKeyRow.frame = CGRect(origin: CGPoint(x: 0, y: StatusButton.statusInset), size: CGSize(width: candidateViewWidth, height: numKeyRowHeight))
-            numKeyRow.isHidden = false
-            collectionView.isHidden = true
-        } else {
-            collectionView.isHidden = false
-        }
-
+        
         super.layoutSubviews()
         layoutButtons()
         

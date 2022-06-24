@@ -97,6 +97,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
     cangjie(String, KeyCapHints?, /* children key caps */ [KeyCap]?),
     stroke(String),
     jyutPing10Keys(String),
+    selectRomanization,
     emoji(String),
     keyboardType(KeyboardType),
     returnKey(ReturnKeyType),
@@ -154,6 +155,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         case .dismissKeyboard: return .dismissKeyboard
         case .combo: return .none // Dynamically evaluated in KeyView.
         case .keypadRimeDelimiter: return .rime(.delimiter)
+        case .selectRomanization: return .toggleTenKeysSpecialization
         default: return .none
         }
     }
@@ -315,6 +317,7 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
             case "W": return "W X Y Z"
             default: return nil
             }
+        case .selectRomanization: return "選拼音"
         case .exportFile(let namePrefix, _): return namePrefix.capitalized
         case .currency: return SessionState.main.currencySymbol
         case .exit: return "Exit"
@@ -485,6 +488,30 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
             return currencyLists
         case "'": return ["'", "＇"]
         case "\"": return ["\"", "＂"]
+        case "a": return [self, "à", "á", "â", "ä", "æ", "ã", "å", "ā"]
+        case "c": return [self, "ç", "ć", "č"]
+        case "e": return [self, "è", "é", "ê", "ë", "ē", "ė", "ę"]
+        case "i": return [self, "î", "ï", "í", "ī", "į", "ì"]
+        case "l": return [self, "ł"]
+        case "m": return [self, "m̀", "ḿ"]
+        case "n": return [self, "ñ", "ń"]
+        case "o": return [self, "ô", "ö", "ò", "ó", "œ", "ø", "ō", "õ"]
+        case "s": return [self, "ß", "ś", "š"]
+        case "u": return [self, "û", "ü", "ù", "ú", "ū"]
+        case "y": return [self, "ÿ"]
+        case "z": return [self, "ž", "ź", "ż"]
+        case "A": return [self, "À", "Á", "Â", "Ä", "Æ", "Ã", "Å", "Ā"]
+        case "C": return [self, "Ç", "Ć", "Č"]
+        case "E": return [self, "È", "É", "Ê", "Ë", "Ē", "Ė", "Ę"]
+        case "I": return [self, "Î", "Ï", "Í", "Ī", "Į", "Ì"]
+        case "L": return [self, "Ł"]
+        case "M": return [self, "M̀", "Ḿ"]
+        case "N": return [self, "Ñ", "Ń"]
+        case "O": return [self, "Ô", "Ö", "Ò", "Ó", "Œ", "Ø", "Ō", "Õ"]
+        case "S": return [self, "Ś", "Š"]
+        case "U": return [self, "Û", "Ü", "Ù", "Ú", "Ū"]
+        case "Y": return [self, "Ÿ"]
+        case "Z": return [self, "Ž", "Ź", "Ż"]
         default: return [self]
         }
     }
@@ -512,11 +539,28 @@ indirect enum KeyCap: Equatable, ExpressibleByStringLiteral {
         }
     }
     
+    var isKeyboardType: Bool {
+        switch self {
+        case .keyboardType: return true
+        default: return false
+        }
+    }
+    
     var isPlaceholder: Bool {
         switch self {
         case .placeholder: return true
         default: return false
         }
+    }
+    
+    var isRimeTone: Bool {
+        switch self {
+        case .rime(let rc, _, _):
+            return rc == .tone1 || rc == .tone2 || rc == .tone3 ||
+                   rc == .tone4 || rc == .tone5 || rc == .tone6
+        default: ()
+        }
+        return false
     }
     
     var unescaped: KeyCap {

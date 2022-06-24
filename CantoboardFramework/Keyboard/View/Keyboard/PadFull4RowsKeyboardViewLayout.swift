@@ -17,35 +17,35 @@ class PadFull4RowsKeyboardViewLayout : KeyboardViewLayout {
         [["\t"], ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], [.backspace]],
         [[.toggleInputMode(.english, nil)], ["a", "s", "d", "f", "g", "h", "j", "k", "l"], [.returnKey(.default)]],
         [[.shift(.lowercased)], ["z", "x", "c", "v", "b", "n", "m", .contextual(","), .contextual(".")], [.shift(.lowercased)]],
-        [[.nextKeyboard, .keyboardType(.numSymbolic)], [.space(.space)], [.keyboardType(.numSymbolic), .dismissKeyboard]]
+        [[.nextKeyboard, .keyboardType(.numSymbolic), .keyboardType(.emojis)], [.space(.space)], [.keyboardType(.numSymbolic), .dismissKeyboard]]
     ]
     
     static let numbersHalf: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
         [[.placeholder(.toggleInputMode(.english, nil))], ["@", "#", .currency, "/", "(", ")", "「", "」", .singleQuote], [.returnKey(.default)]],
         [[.keyboardType(.symbolic)], ["%", "-", "~", "…", "､", ";", ":", ",", "."], [.keyboardType(.symbolic)]],
-        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
+        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased)), .keyboardType(.emojis)], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
     
     static let numbersFull: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
         [[.placeholder(.toggleInputMode(.english, nil))], ["@", "#", .currency, "／", "（", "）", "「", "」", .singleQuote], [.returnKey(.default)]],
         [[.keyboardType(.symbolic)], ["%", "—", "～", "⋯", "、", "；", "：", "，", "。"], [.keyboardType(.symbolic)]],
-        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
+        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased)), .keyboardType(.emojis)], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
     
     static let symbolsHalf: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
         [[.placeholder(.toggleInputMode(.english, nil))], ["^", "_", "|", "\\", "[", "]", "{", "}", .doubleQuote], [.returnKey(.default)]],
         [[.keyboardType(.numeric)], ["*", "&", "+", "=", "•", "<", ">", "!", "?"], [.keyboardType(.numeric)]],
-        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
+        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased)), .keyboardType(.emojis)], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
     
     static let symbolsFull: [[[KeyCap]]] = [
         [["\t"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], [.backspace]],
         [[.placeholder(.toggleInputMode(.english, nil))], ["^", "_", "｜", "＼", "［", "］", "｛", "｝", .doubleQuote], [.returnKey(.default)]],
         [[.keyboardType(.numeric)], ["*", "&", "+", "=", "·", "《", "》", "！", "？"], [.keyboardType(.numeric)]],
-        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased))], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
+        [[.nextKeyboard, .keyboardType(.alphabetic(.lowercased)), .keyboardType(.emojis)], [.space(.space)], [.keyboardType(.alphabetic(.lowercased)), .dismissKeyboard]]
     ]
     
     static func layoutKeyViews(keyRowView: KeyRowView, leftKeys: [KeyView], middleKeys: [KeyView], rightKeys: [KeyView], layoutConstants: LayoutConstants) -> [CGRect] {
@@ -103,9 +103,13 @@ class PadFull4RowsKeyboardViewLayout : KeyboardViewLayout {
             case .returnKey: width = padFull4RowsLayoutConstants.returnKeyWidth
             default:
                 if keyRowView.rowId == 3 && groupLayoutDirection == .left {
-                    width = ((padFull4RowsLayoutConstants.smallSystemKeyWidth * 3 + 2 * layoutConstants.buttonGapX) - layoutConstants.buttonGapX) / 2
+                    let groupWidth = padFull4RowsLayoutConstants.smallSystemKeyWidth * 3 + 2 * layoutConstants.buttonGapX
+                    let buttonCount = CGFloat(keys.count)
+                    width = (groupWidth - (buttonCount - 1) * layoutConstants.buttonGapX) / buttonCount
                 } else if keyRowView.rowId == 3 && groupLayoutDirection == .right {
-                    width = padFull4RowsLayoutConstants.largeSystemKeyWidth
+                    let groupWidth = padFull4RowsLayoutConstants.largeSystemKeyWidth * 2 + layoutConstants.buttonGapX
+                    let buttonCount = CGFloat(keys.count)
+                    width = (groupWidth - (buttonCount - 1) * layoutConstants.buttonGapX) / buttonCount
                 } else {
                     width = 0
                     numFlexibleWidthKeys += 1

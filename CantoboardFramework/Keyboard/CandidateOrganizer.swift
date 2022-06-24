@@ -26,6 +26,7 @@ protocol CandidateSource: AnyObject {
     func getNumberOfSections() -> Int
     func getCandidate(indexPath: IndexPath) -> String?
     func selectCandidate(indexPath: IndexPath) -> String?
+    func unlearnCandidate(indexPath: IndexPath)
     func getCandidateComment(indexPath: IndexPath) -> String?
     func getCandidateCount(section: Int) -> Int
     func getSectionHeader(section: Int) -> String?
@@ -50,7 +51,6 @@ class InputEngineCandidateSource: CandidateSource {
     private var hasLoadedAllBestRimeCandidates = false
     private var hasPopulatedBestEnglishCandidates = false, hasPopulatedWorstEnglishCandidates = false
     private weak var inputController: InputController?
-    private var _groupByMode = GroupByMode.byFrequency
     
     var isStatic: Bool { false }
     
@@ -348,6 +348,19 @@ class InputEngineCandidateSource: CandidateSource {
         return selectedCandidate
     }
     
+    func unlearnCandidate(indexPath: IndexPath) {
+        guard let candidatePath = getCandidatePath(indexPath: indexPath) else { return }
+        
+        switch candidatePath.source {
+        case .rime: _ = inputController?.inputEngine.unlearnRimeCandidate(candidatePath.index)
+        case .english:
+            if let word = getCandidate(indexPath: indexPath) {
+                _ = EnglishInputEngine.userDictionary.unlearn(word: word)
+            }
+        }
+        resetCandidates()
+    }
+    
     func getCandidateComment(indexPath: IndexPath) -> String? {
         guard let candidatePath = getCandidatePath(indexPath: indexPath) else { return nil }
         
@@ -376,11 +389,9 @@ class InputEngineCandidateSource: CandidateSource {
         [ .byFrequency, .byRomanization, .byRadical, .byTotalStroke ]
     }
     
-    var groupByMode: GroupByMode {
-        get { _groupByMode }
-        set {
-            guard newValue != _groupByMode else { return }
-            _groupByMode = newValue
+    var groupByMode: GroupByMode = GroupByMode.byFrequency {
+        didSet {
+            guard oldValue != groupByMode else { return }
             updateCandidates(reload: true)
         }
     }
@@ -414,6 +425,9 @@ class AutoSuggestionCandidateSource: CandidateSource {
     
     func selectCandidate(indexPath: IndexPath) -> String? {
         return getCandidate(indexPath: indexPath)
+    }
+    
+    func unlearnCandidate(indexPath: IndexPath) {
     }
     
     func getCandidateComment(indexPath: IndexPath) -> String? {
@@ -525,7 +539,9 @@ class CandidateOrganizer {
     
     func updateCandidates(reload: Bool, targetCandidatesCount: Int = 0) {
         guard let inputController = inputController else { return }
-        if inputController.inputEngine.isComposing {
+        if inputController.state.isInCaretMovingMode {
+            candidateSource = nil
+        } else if inputController.inputEngine.isComposing {
             candidateSource = InputEngineCandidateSource(inputController: inputController)
         } else if let autoSuggestionType = autoSuggestionType {
             switch autoSuggestionType {
@@ -569,6 +585,10 @@ class CandidateOrganizer {
         let candidate = candidateSource?.selectCandidate(indexPath: indexPath)
         updateCandidates(reload: true)
         return candidate
+    }
+    
+    func unlearnCandidate(indexPath: IndexPath) {
+        candidateSource?.unlearnCandidate(indexPath: indexPath)
     }
     
     func getCandidateComment(indexPath: IndexPath) -> String? {

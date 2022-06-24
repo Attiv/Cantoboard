@@ -88,6 +88,7 @@ private class Switch: Option {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         value = control.isOn
         controller.settings[keyPath: key] = value
+        controller.view.endEditing(true)
         Settings.save(controller.settings)
     }
 }
@@ -124,6 +125,7 @@ private class Segment<T: Equatable>: Option {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         value = options[control.selectedSegmentIndex].value
         controller.settings[keyPath: key] = value
+        controller.view.endEditing(true)
         Settings.save(controller.settings)
     }
 }
@@ -142,6 +144,12 @@ extension Settings {
                         LocalizedStrings.candidateBarStyle_full: true,
                         LocalizedStrings.candidateBarStyle_ios: false,
                 ]),
+                Segment(LocalizedStrings.padLeftSysKey, \.padLeftSysKeyAsKeyboardType, [
+                        LocalizedStrings.padLeftSysKey_default: false,
+                        LocalizedStrings.padLeftSysKey_keyboardType: true,
+                    ],
+                    LocalizedStrings.padLeftSysKey_description
+                ),
             ]
         )
         
@@ -151,7 +159,6 @@ extension Settings {
                 [
                     Switch(LocalizedStrings.mixedMode, \.isMixedModeEnabled,
                            LocalizedStrings.mixedMode_description, "Guide1-2"),
-                    // Switch(LocalizedStrings.numKeyRow, \.enableNumKeyRow),
                     Switch(LocalizedStrings.longPressSymbolKeys, \.isLongPressSymbolKeysEnabled, LocalizedStrings.longPressSymbolKeys_description),
                     Switch(LocalizedStrings.smartFullStop, \.isSmartFullStopEnabled,
                            LocalizedStrings.smartFullStop_description, "Guide8-1"),
@@ -170,6 +177,7 @@ extension Settings {
                     ),
                     Switch(LocalizedStrings.showBottomLeftSwitchLangButton, \.showBottomLeftSwitchLangButton,
                            LocalizedStrings.showBottomLeftSwitchLangButton_description),
+                    Switch(LocalizedStrings.enableCharPreview, \.enableCharPreview),
                 ]
             ),
             UIDevice.current.userInterfaceIdiom == .pad ? padSection : nil,

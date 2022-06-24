@@ -41,6 +41,7 @@
 		79248CD328274BEC00AB1327 /* RimePluginExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 79248CD228274BEC00AB1327 /* RimePluginExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79248CD528274CB200AB1327 /* RimePluginExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 79248CD428274CB200AB1327 /* RimePluginExtension.mm */; };
 		79248CD72827A11B00AB1327 /* Optional+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79248CD62827A11B00AB1327 /* Optional+Extension.swift */; };
+		792D1C152830738500AD5BC0 /* FloatingPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D1C142830738500AD5BC0 /* FloatingPoint+Extension.swift */; };
 		792DF3C4274341F500F9828C /* Weak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792DF3C3274341F500F9828C /* Weak.swift */; };
 		79305FF4260A6EF7002131EF /* DefaultDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79305FF3260A6EF7002131EF /* DefaultDictionary.swift */; };
 		79515A7E2609AA1500D29A5C /* LevelDbTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = 79515A7D2609AA1500D29A5C /* LevelDbTable.mm */; };
@@ -50,7 +51,6 @@
 		795B22D5261EEE1400271D9F /* UserDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795B22D4261EEE1400271D9F /* UserDictionary.swift */; };
 		79607A5D260D9E6600E23D33 /* CandidateCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79607A5C260D9E6600E23D33 /* CandidateCollectionView.swift */; };
 		79607A65260FF09200E23D33 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79607A64260FF09200E23D33 /* String+Extension.swift */; };
-		796DB25F273DAA7E0062E09E /* NumKeyRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796DB25E273DAA7E0062E09E /* NumKeyRow.swift */; };
 		796E53E526E6E1D700C9B187 /* PadShortKeyboardViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796E53E426E6E1D700C9B187 /* PadShortKeyboardViewLayout.swift */; };
 		796E53EB26E6E1F400C9B187 /* PhoneKeyboardViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796E53EA26E6E1F400C9B187 /* PhoneKeyboardViewLayout.swift */; };
 		796E53F126E6E3CD00C9B187 /* PadFull4RowsKeyboardViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796E53F026E6E3CD00C9B187 /* PadFull4RowsKeyboardViewLayout.swift */; };
@@ -360,6 +360,7 @@
 		79248CD228274BEC00AB1327 /* RimePluginExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RimePluginExtension.h; sourceTree = "<group>"; };
 		79248CD428274CB200AB1327 /* RimePluginExtension.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RimePluginExtension.mm; sourceTree = "<group>"; };
 		79248CD62827A11B00AB1327 /* Optional+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Extension.swift"; sourceTree = "<group>"; };
+		792D1C142830738500AD5BC0 /* FloatingPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Extension.swift"; sourceTree = "<group>"; };
 		792DF3C3274341F500F9828C /* Weak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weak.swift; sourceTree = "<group>"; };
 		79305FF3260A6EF7002131EF /* DefaultDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDictionary.swift; sourceTree = "<group>"; };
 		79515A7D2609AA1500D29A5C /* LevelDbTable.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LevelDbTable.mm; sourceTree = "<group>"; };
@@ -370,7 +371,6 @@
 		795B22D4261EEE1400271D9F /* UserDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDictionary.swift; sourceTree = "<group>"; };
 		79607A5C260D9E6600E23D33 /* CandidateCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateCollectionView.swift; sourceTree = "<group>"; };
 		79607A64260FF09200E23D33 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		796DB25E273DAA7E0062E09E /* NumKeyRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumKeyRow.swift; sourceTree = "<group>"; };
 		796E53E426E6E1D700C9B187 /* PadShortKeyboardViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadShortKeyboardViewLayout.swift; sourceTree = "<group>"; };
 		796E53EA26E6E1F400C9B187 /* PhoneKeyboardViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneKeyboardViewLayout.swift; sourceTree = "<group>"; };
 		796E53F026E6E3CD00C9B187 /* PadFull4RowsKeyboardViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadFull4RowsKeyboardViewLayout.swift; sourceTree = "<group>"; };
@@ -788,7 +788,7 @@
 				79B9B5A025F34A1200238E80 /* KeyView.swift */,
 				79B9B5A325F34A1200238E80 /* LayoutConstants.swift */,
 				79BE977F26D74B460059E58A /* Status */,
-				796DB25E273DAA7E0062E09E /* NumKeyRow.swift */,
+				794753B827B79A9A00D63EBC /* FilterBarView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1044,12 +1044,13 @@
 				79B9B59A25F34A1200238E80 /* CGSize+Extension.swift */,
 				79B9B59625F34A1200238E80 /* Character+Extension.swift */,
 				79B9B59525F34A1200238E80 /* Collection+Extension.swift */,
+				792D1C142830738500AD5BC0 /* FloatingPoint+Extension.swift */,
+				79248CD62827A11B00AB1327 /* Optional+Extension.swift */,
 				79607A64260FF09200E23D33 /* String+Extension.swift */,
 				79B9B59425F34A1200238E80 /* UIColor+Extension.swift */,
 				79B9B59825F34A1200238E80 /* UIEdgeInsets+Extension.swift */,
 				79B9B59325F34A1200238E80 /* UITextDocumentProxy+Extension.swift */,
 				7906D6DF26D8D35E004C3C0F /* UIView+Extension.swift */,
-				79248CD62827A11B00AB1327 /* Optional+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1227,7 +1228,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					7904A1D82771481200963CAB = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -1444,6 +1445,7 @@
 				79B9B60A25F34A1200238E80 /* KeyboardView.swift in Sources */,
 				7922EF2F26D61029007E1699 /* KeyboardViewLayout.swift in Sources */,
 				79B9B5FE25F34A1200238E80 /* CGPoints+Extension.swift in Sources */,
+				792D1C152830738500AD5BC0 /* FloatingPoint+Extension.swift in Sources */,
 				79B9B60C25F34A1200238E80 /* KeyCap.swift in Sources */,
 				799D91A32674690700AE9DBD /* StatusButton.swift in Sources */,
 				799D91AD26746D2500AE9DBD /* Sessions.swift in Sources */,
@@ -1491,7 +1493,6 @@
 				79B9B5FD25F34A1200238E80 /* Character+Extension.swift in Sources */,
 				796E53FB26E71CEA00C9B187 /* PadFull5RowsKeyboardViewLayout.swift in Sources */,
 				79B9B5F525F34A1200238E80 /* EnglishInputEngine.swift in Sources */,
-				796DB25F273DAA7E0062E09E /* NumKeyRow.swift in Sources */,
 				798032A52645F6AF008DC703 /* Logging.swift in Sources */,
 				79515A7E2609AA1500D29A5C /* LevelDbTable.mm in Sources */,
 				79B9B5F425F34A1200238E80 /* RimeApi.swift in Sources */,
@@ -1619,6 +1620,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1640,6 +1642,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1711,6 +1714,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1771,6 +1775,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

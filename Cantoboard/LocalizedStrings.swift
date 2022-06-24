@@ -40,11 +40,16 @@ class LocalizedStrings {
     static let symbolShape_description = localizedString("inputMethodSettings.symbolShape.description")
     static let showBottomLeftSwitchLangButton = localizedString("inputMethodSettings.showBottomLeftSwitchLangButton")
     static let showBottomLeftSwitchLangButton_description = localizedString("inputMethodSettings.showBottomLeftSwitchLangButton.description")
+    static let enableCharPreview = localizedString("inputMethodSettings.enableCharPreview")
     
     static let padSettings = localizedString("padSettings")
     static let candidateBarStyle = localizedString("padSettings.candidateBarStyle")
     static let candidateBarStyle_full = localizedString("padSettings.candidateBarStyle.full")
     static let candidateBarStyle_ios = localizedString("padSettings.candidateBarStyle.ios")
+    static let padLeftSysKey = localizedString("padSettings.leftSysKey")
+    static let padLeftSysKey_description = localizedString("padSettings.leftSysKey.description")
+    static let padLeftSysKey_default = localizedString("padSettings.leftSysKey.default")
+    static let padLeftSysKey_keyboardType = localizedString("padSettings.leftSysKey.keyboardType")
     
     static let mixedInputSettings = localizedString("mixedInputSettings")
     static let smartSpace = localizedString("mixedInputSettings.smartSpace")

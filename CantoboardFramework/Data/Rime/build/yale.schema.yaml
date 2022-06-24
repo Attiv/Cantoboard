@@ -2,12 +2,12 @@ __build_info:
   rime_version: 1.7.3
   timestamps:
     common.custom: 0
-    default: 1651247052
-    default.custom: 1651247051
-    symbols: 1651247052
+    default: 1639099840
+    default.custom: 1644658314
+    symbols: 1610967803
     symbols.custom: 0
-    symbols_cantonese: 1651247051
-    yale.schema: 1651247051
+    symbols_cantonese: 1629626926
+    yale.schema: 1654750086
 engine:
   filters:
     - "simplifier@variants_hk"
@@ -34,7 +34,7 @@ engine:
     - script_translator
 menu:
   alternative_select_keys: "          "
-  page_size: 10
+  page_size: 500
 punctuator:
   full_shape:
     " ": {commit: "　"}
@@ -330,7 +330,7 @@ schema:
   description: "耶魯–劉錫祥混合拼音"
   name: "耶魯–劉錫祥混合拼音"
   schema_id: yale
-  version: 2021.08.22
+  version: 2022.06.07
 simp_hk2s:
   opencc_config: hk2s.json
   option_name: simp_hk2s
@@ -344,6 +344,7 @@ speller:
     - "xform/jy?/y/"
     - "derive/yu(?!ng|k)/y/"
     - "erase/^y\\d$/"
+    - "derive/(g|k)u(?!ng|k)/$1wu/"
     - "derive/oe|eo/eu/"
     - "derive/aa/r/"
     - "derive/eu/v/"

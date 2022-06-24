@@ -59,6 +59,7 @@ struct KeyboardState: Equatable {
     var spaceKeyMode: SpaceKeyMode
     
     var isKeyboardAppearing: Bool
+    var isInCaretMovingMode: Bool
     
     var keyboardIdiom: LayoutIdiom
     
@@ -97,6 +98,7 @@ struct KeyboardState: Equatable {
         specialSymbolShapeOverride = [:]
         let layoutConstants = LayoutConstants.forMainScreen
         isKeyboardAppearing = false
+        isInCaretMovingMode = false
         keyboardIdiom = layoutConstants.idiom
         isPortrait = layoutConstants.isPortrait
         
@@ -250,6 +252,12 @@ class InputController: NSObject {
     }
     
     private func candidateSelected(choice: IndexPath, enableSmartSpace: Bool) {
+        // Move caret forward to consume all delimiters.
+        while let rimeComposition = inputEngine.rimeComposition,
+              let rc = rimeComposition.text.char(at: rimeComposition.caretIndex),
+              rc == "'" || rc == TenKeysController.filterBarDelimiter {
+            _ = inputEngine.moveCaret(offset: 1)
+        }
         if let commitedText = candidateOrganizer.selectCandidate(indexPath: choice) {
             if candidateOrganizer?.autoSuggestionType?.replaceTextOnInsert ?? false {
                 textDocumentProxy?.deleteBackward(times: replaceTextLen)
@@ -274,14 +282,10 @@ class InputController: NSObject {
     }
     
     private func candidateLongPressed(choice: IndexPath) {
-        if let text = candidateOrganizer.getCandidate(indexPath: choice), text.allSatisfy({ $0.isEnglishLetter }) {
-            if EnglishInputEngine.userDictionary.unlearnWord(word: text) {
-                FeedbackProvider.lightImpact.impactOccurred()
-                let candidateCount = candidateOrganizer.getCandidateCount(section: choice.section)
-                inputEngine.updateEnglishCandidates()
-                candidateOrganizer.updateCandidates(reload: true, targetCandidatesCount: candidateCount)
-            }
-        }
+        FeedbackProvider.lightImpact.impactOccurred()
+        let candidateCount = candidateOrganizer.getCandidateCount(section: choice.section)
+        candidateOrganizer.unlearnCandidate(indexPath: choice)
+        candidateOrganizer.updateCandidates(reload: true, targetCandidatesCount: candidateCount)
     }
     
     private func handleSpace(spaceKeyMode: SpaceKeyMode) {
@@ -399,6 +403,8 @@ class InputController: NSObject {
         switch action {
         case .moveCursorForward, .moveCursorBackward:
             moveCursor(offset: action == .moveCursorBackward ? -1 : 1)
+            updateComposition()
+            return
         case .character(let c):
             guard let char = c.first else { return }
             vt = c
@@ -416,12 +422,6 @@ class InputController: NSObject {
             if !(shouldFeedCharToInputEngine && inputEngine.processChar(char)) {
                 if !insertComposingText(appendBy: c) {
                     insertText(c)
-                }
-            } else {
-                // TODO editing input buffer is disabled at the moment.
-                if isComposing && state.activeSchema.is10Keys {
-                    DDLogInfo("UFO inputEngine.englishComposition \(inputEngine.englishComposition?.caretIndex ?? 0)")
-                    tenKeysController.removeSpecializations(after: inputEngine.englishComposition?.caretIndex ?? 0, isAfterInclusive: true, &state.tenKeysState)
                 }
             }
             if !isHoldingShift && state.keyboardType == .some(.alphabetic(.uppercased)) {
@@ -483,7 +483,6 @@ class InputController: NSObject {
                             // Remove the last specialization
                             tenKeysController.removeLastSpecialization(&state.tenKeysState)
                         } else {
-                            // TODO editing input buffer is disabled at the moment.
                             // User is modifiying the content at the middle of the input buffer.
                             // Remove all specialization overlapping with the change.
                             // Then let the rest of the code remove
@@ -596,7 +595,12 @@ class InputController: NSObject {
                 do {
                     try FileManager.default.zipItem(at: URL(fileURLWithPath: path, isDirectory: true), to: zipFilePath)
                     let share = UIActivityViewController(activityItems: [zipFilePath], applicationActivities: nil)
-                    DispatchQueue.main.async { self.keyboardViewController?.present(share, animated: true, completion: nil) }
+                    DispatchQueue.main.async {
+                        share.popoverPresentationController?.sourceView = self.keyboardViewController?.keyboardView
+                        share.preferredContentSize = self.keyboardViewController?.keyboardView?.bounds.size ?? .zero
+                        share.popoverPresentationController?.sourceRect = .zero
+                        self.keyboardViewController?.present(share, animated: true, completion: nil)
+                    }
                 } catch {
                     DDLogError("Failed to export \(namePrefix) at \(path).")
                 }
@@ -605,8 +609,12 @@ class InputController: NSObject {
                     keyboardViewController?.keyboardView?.state = state
                 }
             }
-        case .caretMovingMode(let isCaretMovingMode):
-            state.enableState = isCaretMovingMode ? .disabled : .enabled
+        case .caretMovingMode(let isInCaretMovingMode):
+            state.enableState = isInCaretMovingMode ? .disabled : .enabled
+            state.isInCaretMovingMode = isInCaretMovingMode
+            if state.activeSchema.is10Keys {
+                tenKeysController.caretMovingModeChanged(isInCaretMovingMode: isInCaretMovingMode)
+            }
             keyboardViewController?.keyboardView?.state = state
         case .dismissKeyboard:
             keyboardViewController?.dismissKeyboard()
@@ -619,7 +627,16 @@ class InputController: NSObject {
             updateInputState()
             return
         case .selectTenKeysSpecialization(let candidateIndex):
-            tenKeysController.addSpecialization(candidateIndex: candidateIndex, state: &state.tenKeysState)
+            tenKeysController.addSpecialization(candidateIndex: candidateIndex, holdCaret: false, state: &state.tenKeysState)
+            candidateOrganizer.updateCandidates(reload: true)
+            updateComposition()
+            return
+        case .toggleTenKeysSpecialization:
+            var nextCandidateIndex = 0
+            if let selectedSpecializationCandidateIndex = state.tenKeysState.selectedSpecializationCandidateIndex {
+                nextCandidateIndex = (selectedSpecializationCandidateIndex + 1) % state.tenKeysState.specializationCandidates.count
+            }
+            tenKeysController.addSpecialization(candidateIndex: nextCandidateIndex, holdCaret: true, state: &state.tenKeysState)
             candidateOrganizer.updateCandidates(reload: true)
             updateComposition()
             return
@@ -659,8 +676,8 @@ class InputController: NSObject {
         let activeSchema = state.activeSchema
         let is10Keys = activeSchema == .jyutping10keys && state.inputMode != .english
         keyboardViewController?.hasFilterBar = is10Keys && state.keyboardType != .emojis
-        keyboardViewController?.hasCompositionView = !is10Keys && (isImmediateMode || activeSchema.isCangjieFamily && state.inputMode == .mixed)
-        keyboardViewController?.hasCompositionResetButton = !is10Keys && isImmediateMode && state.isComposing
+        keyboardViewController?.hasCompositionView = (isImmediateMode || activeSchema.isCangjieFamily && state.inputMode == .mixed)
+        keyboardViewController?.hasCompositionResetButton = isImmediateMode && state.isComposing
     }
     
     func isTextFieldWebSearch() -> Bool {

@@ -113,32 +113,26 @@ public enum RimeSchema: String, Codable {
 
 class RimeInputEngine: NSObject, InputEngine {
     private weak var rimeSession: RimeSession?
-    private var _schema: RimeSchema
     private(set) var hasLoadedAllCandidates = false
     
     var schema: RimeSchema {
-        get { _schema }
-        set {
-            guard newValue != _schema else { return }
-            DDLogInfo("Switching scheam of session \(rimeSession?.debugDescription ?? "") from \(schema) to \(newValue)")
-            _schema = newValue
-            setCurrentSchema(_schema)
+        didSet {
+            guard oldValue != schema else { return }
+            DDLogInfo("Switching scheam of session \(rimeSession?.debugDescription ?? "") from \(oldValue) to \(schema)")
+            setCurrentSchema(schema)
             refreshCharForm()
         }
     }
     
-    private var _charForm: CharForm = SessionState.main.lastCharForm
-    var charForm: CharForm {
-        get { _charForm }
-        set {
-            guard _charForm != newValue else { return }
-            _charForm = newValue
-            setCharForm(isSimplification: _charForm == .simplified)
+    var charForm: CharForm = SessionState.main.lastCharForm {
+        didSet {
+            guard oldValue != charForm else { return }
+            setCharForm(isSimplification: charForm == .simplified)
         }
     }
     
     init(schema: RimeSchema) {
-        _schema = schema
+        self.schema = schema
         super.init()
     }
     
@@ -264,6 +258,16 @@ class RimeInputEngine: NSObject, InputEngine {
         return rimeSession.getCommitedText()
     }
     
+    func unlearnCandidate(_ index: Int) -> Bool {
+        guard let rimeSession = rimeSession else {
+            DDLogInfo("unlearnCandidate RimeSession is nil.")
+            return false
+        }
+        let deleted = rimeSession.unlearnCandidate(index)
+        refreshCandidates()
+        return deleted
+    }
+    
     var composition: Composition? {
         get {
             guard let rimeSession = rimeSession else { return nil }
@@ -353,7 +357,7 @@ class RimeInputEngine: NSObject, InputEngine {
     }
     
     private func refreshCharForm() {
-        setCharForm(isSimplification: _charForm == .simplified)
+        setCharForm(isSimplification: charForm == .simplified)
     }
     
     private func setCharForm(isSimplification: Bool) {

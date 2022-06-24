@@ -38,7 +38,7 @@ protocol Copyable {
 }
 
 class PhoneLayoutConstants: LayoutConstants {
-    private static let contentEdgeInsetsPhonePortrait = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
+    private static let contentEdgeInsetsPhonePortrait = UIEdgeInsets(top: 2, left: 1.5, bottom: 2, right: 1.5)
     private static let contentEdgeInsetsPhoneLandscape = UIEdgeInsets(top: 2, left: 2, bottom: 5, right: 2)
     
     let systemKeyWidthRatio: CGFloat
@@ -642,7 +642,7 @@ let layoutConstantsList: [IntDuplet: LayoutConstants] = [
         tabKeyWidth: 106,
         capLockKeyWidth: 119,
         leftShiftKeyWidth: 154,
-        smallSystemKeyWidth: 94,
+        smallSystemKeyWidth: 93,
         deleteKeyWidth: 106,
         returnKeyWidth: 120,
         rightShiftKeyWidth: 155,
@@ -662,7 +662,7 @@ let layoutConstantsList: [IntDuplet: LayoutConstants] = [
         tabKeyWidth: 135,
         capLockKeyWidth: 157,
         leftShiftKeyWidth: 204,
-        smallSystemKeyWidth: 126,
+        smallSystemKeyWidth: 125,
         deleteKeyWidth: 135,
         returnKeyWidth: 157,
         rightShiftKeyWidth: 204,
@@ -915,7 +915,8 @@ extension LayoutConstants {
              .space,
              .toggleInputMode,
              "^_^",
-             .keypadRimeDelimiter: return 16
+             .keypadRimeDelimiter,
+             .selectRomanization: return 16
         case .returnKey, "\t", .shift, .nextKeyboard, .dismissKeyboard: return 18
         case .cangjie(_, let hints, _) where hints != nil: return 20
         case .backspace: return 20

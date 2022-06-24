@@ -24,6 +24,8 @@ internal class EmojiPopView: UIView {
     internal var currentEmoji: String = ""
     internal var emojiArray: [String] = []
     
+    internal var constants: Constants = PhoneConstants()
+    
     // MARK: - Private variables
     
     private var locationX: CGFloat = 0.0
@@ -34,20 +36,24 @@ internal class EmojiPopView: UIView {
     private var emojisX: CGFloat = 0.0
     private var emojisWidth: CGFloat = 0.0
     
+    private var showBottomPart: Bool = true
+    
     // MARK: - Init functions
     
-    init() {
-        super.init(frame: CGRect(x: 0, y: 0, width: EmojiPopViewSize.width, height: EmojiPopViewSize.height))
+    init(constants: Constants) {
+        self.constants = constants
+        let emojiPopViewSize = constants.emojiPopViewSize
+        super.init(frame: CGRect(x: 0, y: 0, width: emojiPopViewSize.width, height: emojiPopViewSize.height))
     }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Override functions
     
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let result = point.x >= emojisX && point.x <= emojisX + emojisWidth && point.y >= 0 && point.y <= TopPartSize.height
+        let result = point.x >= emojisX && point.x <= emojisX + emojisWidth && point.y >= 0 && point.y <= constants.topPartSize.height
         
         if !result {
             dismiss()
@@ -58,7 +64,12 @@ internal class EmojiPopView: UIView {
     
     // MARK: - Internal functions
     
-    internal func move(location: CGPoint, animation: Bool = true) {
+    internal func move(location: CGPoint, showBottomPart: Bool, animation: Bool = true) {
+        self.showBottomPart = showBottomPart
+        let deltaX = frame.origin.x - location.x
+        let deltaY = frame.origin.y - location.y
+        guard abs(deltaX) > 1e-5 || abs(deltaY) > 1e-5 else { return }
+        
         locationX = location.x
         setupUI()
         
@@ -91,9 +102,11 @@ extension EmojiPopView {
     
     private func createEmojiButton(_ emoji: String) -> UIButton {
         let button = UIButton(type: .custom)
-        button.titleLabel?.font = EmojiFont
+        let emojiFont = constants.emojiFont
+        let emojiSize = constants.emojiSize
+        button.titleLabel?.font = emojiFont
         button.setTitle(emoji, for: .normal)
-        button.frame = CGRect(x: CGFloat(emojiButtons.count) * EmojiSize.width, y: 0, width: EmojiSize.width, height: EmojiSize.height)
+        button.frame = CGRect(x: CGFloat(emojiButtons.count) * emojiSize.width, y: 0, width: emojiSize.width, height: emojiSize.height)
         button.addTarget(self, action: #selector(selectEmojiType(_:)), for: .touchUpInside)
         button.isUserInteractionEnabled = true
         return button
@@ -111,17 +124,20 @@ extension EmojiPopView {
         
         self.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
         
+        let emojiSize = constants.emojiSize
+        let topPartSize = constants.topPartSize
+        let bottomPartSize = constants.bottomPartSize
         // adjust location of emoji bar if it is off the screen
-        emojisWidth = TopPartSize.width + EmojiSize.width * CGFloat(emojiArray.count - 1)
+        emojisWidth = topPartSize.width + emojiSize.width * CGFloat(emojiArray.count - 1)
         emojisX = 0.0 // the x adjustment within the popView to account for the shift in location
         let screenWidth = UIScreen.main.bounds.width
         if emojisWidth + locationX > screenWidth {
             emojisX = -CGFloat(emojisWidth + locationX - screenWidth + 8) // 8 for padding to border
         }
         // readjust in case someone is long-pressing right at the edge of the screen
-        let halfWidth = TopPartSize.width / 2.0 - BottomPartSize.width / 2.0
-        if emojisX + emojisWidth < halfWidth + BottomPartSize.width {
-            emojisX += (halfWidth + BottomPartSize.width) - (emojisX + emojisWidth)
+        let halfWidth = topPartSize.width / 2.0 - bottomPartSize.width / 2.0
+        if emojisX + emojisWidth < halfWidth + bottomPartSize.width {
+            emojisX += (halfWidth + bottomPartSize.width) - (emojisX + emojisWidth)
         }
         
         // path
@@ -147,7 +163,7 @@ extension EmojiPopView {
         layer.addSublayer(contentLayer)
         
         emojisView.removeFromSuperview()
-        emojisView = UIView(frame: CGRect(x: emojisX + 8, y: 10, width: CGFloat(emojiArray.count) * EmojiSize.width, height: EmojiSize.height))
+        emojisView = UIView(frame: CGRect(x: emojisX + 8, y: 10, width: CGFloat(emojiArray.count) * emojiSize.width, height: emojiSize.height))
         
         // add buttons
         emojiButtons = []
@@ -162,28 +178,32 @@ extension EmojiPopView {
     
     func maskPath() -> CGMutablePath {
         let path = CGMutablePath()
+        let topPartSize = constants.topPartSize
+        let bottomPartSize = constants.bottomPartSize
         
         path.addRoundedRect(
                  in: CGRect(
                      x: emojisX,
                      y: 0.0,
                      width: emojisWidth,
-                     height: TopPartSize.height
+                     height: topPartSize.height
                  ),
                  cornerWidth: 10,
                  cornerHeight: 10
              )
 
-        path.addRoundedRect(
-            in: CGRect(
-                x: TopPartSize.width / 2.0 - BottomPartSize.width / 2.0,
-                y: TopPartSize.height - 10,
-                width: BottomPartSize.width,
-                height: BottomPartSize.height + 10
-            ),
-            cornerWidth: 5,
-            cornerHeight: 5
-        )
+        if showBottomPart {
+            path.addRoundedRect(
+                in: CGRect(
+                    x: topPartSize.width / 2.0 - bottomPartSize.width / 2.0,
+                    y: topPartSize.height - 10,
+                    width: bottomPartSize.width,
+                    height: bottomPartSize.height + 10
+                ),
+                cornerWidth: 5,
+                cornerHeight: 5
+            )
+        }
         
         return path
     }

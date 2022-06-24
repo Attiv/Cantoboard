@@ -237,13 +237,15 @@ class KeyboardView: UIView, BaseKeyboardView {
         case .numeric, .numSymbolic:
             let rows = state.symbolShape == .full ? keyboardViewLayout.numbersFull : keyboardViewLayout.numbersHalf
             for (index, keyCaps) in rows.enumerated() {
-                let keyCaps = configureNumberAndSymbolKeyCaps(keyCaps: keyCaps)
+                var keyCaps = configureNumberAndSymbolKeyCaps(keyCaps: keyCaps)
+                configureLowerLeftSystemKeyCap(&keyCaps, rowId: index)
                 keyRows[index].setupRow(keyboardState: state, keyCaps, rowId: index)
             }
         case .symbolic:
             let rows = state.symbolShape == .full ? keyboardViewLayout.symbolsFull : keyboardViewLayout.symbolsHalf
             for (index, keyCaps) in rows.enumerated() {
-                let keyCaps = configureNumberAndSymbolKeyCaps(keyCaps: keyCaps)
+                var keyCaps = configureNumberAndSymbolKeyCaps(keyCaps: keyCaps)
+                configureLowerLeftSystemKeyCap(&keyCaps, rowId: index)
                 keyRows[index].setupRow(keyboardState: state, keyCaps, rowId: index)
             }
         default: ()
@@ -276,10 +278,11 @@ class KeyboardView: UIView, BaseKeyboardView {
                     return configureAlphabeticKeyCap($0, rowId: index, groupId: groupId, shiftState: shiftState)
                 }
             }
+            configureLowerLeftSystemKeyCap(&keyCaps, rowId: index)
             keyRows[index].setupRow(keyboardState: state, keyCaps, rowId: index)
         }
     }
-    
+        
     private func configureAlphabeticKeyCap(_ hardcodedKeyCap: KeyCap, rowId: Int, groupId: Int, shiftState: (KeyboardShiftState)) -> KeyCap? {
         let isInEnglishMode = state.inputMode == .english
         let isInCangjieMode = state.activeSchema.isCangjieFamily
@@ -296,12 +299,6 @@ class KeyboardView: UIView, BaseKeyboardView {
         }
                 
         switch keyCap {
-        case .toggleInputMode:
-            if rowId == 3 && !Settings.cached.showBottomLeftSwitchLangButton {
-                return nil
-            } else {
-                return .toggleInputMode(state.inputMode.afterToggle, state.activeSchema)
-            }
         case .character(let c, let hints, var childrenKeyCaps):
             var leftHint = hints?.leftHint
             var rightHint = hints?.rightHint
@@ -309,7 +306,7 @@ class KeyboardView: UIView, BaseKeyboardView {
             let isLetterKey = c.first?.isEnglishLetter ?? false
             let keyChar = shiftState != .lowercased && c.count == 1 ? c.uppercased() : c
             
-            if shiftState != .lowercased && !state.lastKeyboardTypeChangeFromAutoCap && keyboardViewLayout.isSwipeDownKeyShiftMorphing(keyCap: keyCap) ,
+            if shiftState != .lowercased && !state.lastKeyboardTypeChangeFromAutoCap && keyboardViewLayout.isSwipeDownKeyShiftMorphing(keyCap: keyCap),
                let swipeDownKeyCap = keyboardViewLayout.getSwipeDownKeyCap(keyCap: keyCap, keyboardState: state) {
                 return swipeDownKeyCap
             }
@@ -317,7 +314,16 @@ class KeyboardView: UIView, BaseKeyboardView {
             if state.showCommonSwipeDownKeysInLongPress {
                 if let longPressKeyCap = CommonSwipeDownKeys.getSwipeDownKeyCapForPadShortOrFull4Rows(keyCap: keyCap, keyboardState: state) {
                     leftHint = longPressKeyCap.buttonText
-                    childrenKeyCaps = [longPressKeyCap, keyCap.withoutHints]
+                    let orgChildrenKeyCaps = KeyCap(keyChar).childrenKeyCaps.map { $0.withoutHints }
+                    childrenKeyCaps = [longPressKeyCap] + orgChildrenKeyCaps
+                }
+            }
+            // Special handling to make sure children keys don't go out of screen.
+            // Move the parent key to the other side.
+            if c == "e" || c == "i" || c == "o" || c == "u" {
+                childrenKeyCaps = childrenKeyCaps ?? keyCap.childrenKeyCaps
+                if let selfKeyCap = childrenKeyCaps?.remove(at: 1) {
+                    childrenKeyCaps?.insert(selfKeyCap, at: 0)
                 }
             }
             
@@ -350,7 +356,6 @@ class KeyboardView: UIView, BaseKeyboardView {
                 } else if state.isComposing {
                     if isInLongPressMode {
                         var toneKeyCap: KeyCap? = nil
-                        var reverse = false
                         switch c {
                         case "f":
                             rightHint = "4"
@@ -361,25 +366,20 @@ class KeyboardView: UIView, BaseKeyboardView {
                         case "h":
                             rightHint = "6"
                             toneKeyCap = KeyCap(rime: RimeChar.tone6)
-                            reverse = true
                         case "c":
                             rightHint = "1"
                             toneKeyCap = KeyCap(rime: RimeChar.tone1)
                         case "v":
                             rightHint = "2"
-                            bottomHint = "oe/eo"
                             toneKeyCap = KeyCap(rime: RimeChar.tone2)
                         case "b":
                             rightHint = "3"
                             toneKeyCap = KeyCap(rime: RimeChar.tone3)
-                            reverse = true
                         default: ()
                         }
                         if let toneKeyCap = toneKeyCap {
-                            childrenKeyCaps = orgChildren.reversed() + [toneKeyCap]
-                            if reverse {
-                                childrenKeyCaps?.reverse()
-                            }
+                            childrenKeyCaps = orgChildren
+                            childrenKeyCaps?.insert(toneKeyCap, at: 1)
                         }
                     } else {
                         switch c {
@@ -410,6 +410,29 @@ class KeyboardView: UIView, BaseKeyboardView {
         return keyCaps.enumerated().map { groupId, keyCapGroup in
             keyCapGroup.compactMap { keyCap in
                 return keyCap.symbolTransform(state: state)
+            }
+        }
+    }
+    
+    private func configureLowerLeftSystemKeyCap(_ keyCaps: inout [[KeyCap]], rowId: Int) {
+        if layoutConstants.ref.idiom.isPad && Settings.cached.padLeftSysKeyAsKeyboardType && keyCaps.count == 3 {
+            if let keyboardTypeKeyCapIndex = keyCaps[0].firstIndex(where: { $0.isKeyboardType }) {
+                // Move keyboard type key cap to the left corner.
+                keyCaps[0].swapAt(keyboardTypeKeyCapIndex, 0)
+            }
+        }
+        
+        keyCaps[0] = keyCaps[0].compactMap { keyCap in
+            switch keyCap {
+            case .toggleInputMode:
+                let showBottomLeftSwitchLangButton = Settings.cached.showBottomLeftSwitchLangButton || state.activeSchema.is10Keys
+                if rowId == 3 && !showBottomLeftSwitchLangButton {
+                    let shouldShowEmojiKey = layoutConstants.ref.idiom.isPad || state.needsInputModeSwitchKey
+                    return shouldShowEmojiKey ? KeyCap.keyboardType(.emojis) : nil
+                } else {
+                    return .toggleInputMode(state.inputMode.afterToggle, state.activeSchema)
+                }
+            default: return keyCap
             }
         }
     }
@@ -468,6 +491,7 @@ class KeyboardView: UIView, BaseKeyboardView {
         let keyboardSettings = KeyboardSettings(bottomType: .categories)
         keyboardSettings.needToShowAbcButton = true
         keyboardSettings.updateRecentEmojiImmediately = false
+        keyboardSettings.isPhone = !layoutConstants.ref.idiom.isPad
         
         let emojiView = EmojiView(keyboardSettings: keyboardSettings)
         emojiView.delegate = self

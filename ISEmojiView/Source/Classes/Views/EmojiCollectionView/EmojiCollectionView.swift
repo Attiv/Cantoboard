@@ -44,6 +44,8 @@ internal class EmojiCollectionView: UIView {
         }
     }
     
+    internal var constants: Constants = PhoneConstants()
+    
     // MARK: - Private variables
     
     private var scrollViewWillBeginDragging = false
@@ -51,7 +53,7 @@ internal class EmojiCollectionView: UIView {
     private let emojiCellReuseIdentifier = "EmojiCell"
     
     private lazy var emojiPopView: EmojiPopView = {
-        let emojiPopView = EmojiPopView()
+        let emojiPopView = EmojiPopView(constants: constants)
         emojiPopView.delegate = self
         emojiPopView.isHidden = true
         return emojiPopView
@@ -80,7 +82,7 @@ internal class EmojiCollectionView: UIView {
     
     // MARK: - Init functions
     
-    static func loadFromNib(emojis: [EmojiCategory]) -> EmojiCollectionView {
+    static func loadFromNib(emojis: [EmojiCategory], constants: Constants) -> EmojiCollectionView {
         let nibName = String(describing: EmojiCollectionView.self)
         
         guard let nib = Bundle.podBundle.loadNibNamed(nibName, owner: nil, options: nil) as? [EmojiCollectionView] else {
@@ -91,9 +93,9 @@ internal class EmojiCollectionView: UIView {
             fatalError()
         }
         
+        view.constants = constants
         view.emojis = emojis
         view.setupView()
-        
         return view
     }
     
@@ -104,7 +106,7 @@ internal class EmojiCollectionView: UIView {
             return super.point(inside: point, with: event)
         }
         
-        return point.y >= -TopPartSize.height
+        return point.y >= -constants.topPartSize.height
     }
     
     // MARK: - Internal functions
@@ -126,7 +128,12 @@ internal class EmojiCollectionView: UIView {
         let itemsCountInSection = collectionView(collectionView, numberOfItemsInSection: section)
         let targetItemIndex = Int(round(percentage * Double((itemsCountInSection - 1))))
         
-        let indexPath = IndexPath(item: targetItemIndex, section: section)
+        let numOfColumnsPerPage = Int(collectionView.bounds.width / constants.emojiSize.width)
+        let numOfRowsPerPage = Int(collectionView.bounds.height / constants.emojiSize.height)
+        let numOfCellsPerPage = numOfColumnsPerPage * numOfRowsPerPage
+        let targetItemIndexPageAligned = Int(targetItemIndex / numOfCellsPerPage) * numOfCellsPerPage
+        
+        let indexPath = IndexPath(item: targetItemIndexPageAligned, section: section)
         collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
     }
     
@@ -151,9 +158,9 @@ extension EmojiCollectionView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emojiCellReuseIdentifier, for: indexPath) as! EmojiCollectionCell
         
         if let selectedEmoji = emoji.selectedEmoji {
-            cell.setEmoji(selectedEmoji)
+            cell.setEmoji(selectedEmoji, emojiFont: constants.emojiFont)
         } else {
-            cell.setEmoji(emoji.emoji)
+            cell.setEmoji(emoji.emoji, emojiFont: constants.emojiFont)
         }
         
         return cell
@@ -262,6 +269,9 @@ extension EmojiCollectionView {
         addGestureRecognizer(emojiLongPressGestureRecognizer)
         
         addSubview(emojiPopView)
+        
+        let flow = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        flow.itemSize = constants.emojiSize
     }
     
     @objc private func emojiLongPressHandle(sender: UILongPressGestureRecognizer) {
@@ -299,11 +309,17 @@ extension EmojiCollectionView {
         
         let cellRect = attr.frame
         let cellFrameInSuperView = collectionView.convert(cellRect, to: self)
-        let emojiPopLocation = CGPoint(
-            x: cellFrameInSuperView.origin.x - ((TopPartSize.width - BottomPartSize.width) / 2.0) + 5,
-            y: cellFrameInSuperView.origin.y - TopPartSize.height - 10
+        var emojiPopLocation = CGPoint(
+            x: cellFrameInSuperView.origin.x - ((constants.topPartSize.width - constants.bottomPartSize.width) / 2.0) + 5,
+            y: cellFrameInSuperView.origin.y - constants.topPartSize.height - 10
         )
-        emojiPopView.move(location: emojiPopLocation, animation: sender.state != .began)
+        
+        let isTopOutsideRect = emojiPopLocation.y < 0
+        if isTopOutsideRect {
+            emojiPopLocation.y = cellFrameInSuperView.origin.y + constants.emojiSize.height
+        }
+        
+        emojiPopView.move(location: emojiPopLocation, showBottomPart: !isTopOutsideRect, animation: sender.state != .began)
     }
     
     private func dismissPopView(_ usePopViewEmoji: Bool) {

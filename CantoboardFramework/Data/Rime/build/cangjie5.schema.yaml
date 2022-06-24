@@ -2,12 +2,12 @@ __build_info:
   rime_version: 1.7.3
   timestamps:
     cangjie5.custom: 0
-    cangjie5.schema: 1651247051
-    default: 1651247052
-    default.custom: 1651247051
-    symbols: 1651247052
+    cangjie5.schema: 1654398088
+    default: 1639099840
+    default.custom: 1644658314
+    symbols: 1610967803
     symbols.custom: 0
-    symbols_cantonese: 1651247051
+    symbols_cantonese: 1629626926
 engine:
   filters:
     - uniquifier
@@ -64,7 +64,7 @@ key_binder:
     - {accept: "Control+period", toggle: ascii_punct, when: always}
   import_preset: default
 menu:
-  page_size: 10
+  page_size: 500
 punctuator:
   full_shape:
     " ": {commit: "　"}

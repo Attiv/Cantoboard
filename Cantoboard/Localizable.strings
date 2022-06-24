@@ -43,6 +43,7 @@
 開咗混合模式嘅話會根據前文判斷係咩句子，喺英文句子輸入半形符號，中文句子輸入全形符號。";
 "inputMethodSettings.showBottomLeftSwitchLangButton" = "左下角中英切換掣";
 "inputMethodSettings.showBottomLeftSwitchLangButton.description" = "喺iPhone同某啲iPad型號，喺鍵盤左下角顯示中英切換掣。";
+"inputMethodSettings.enableCharPreview" = "文字預覽";
 
 "mixedInputSettings" = "粵英混合輸入設定";
 "mixedInputSettings.smartSpace" = "智能英文空格";
@@ -56,6 +57,10 @@
 "padSettings.candidateBarStyle" = "候選詞列表風格";
 "padSettings.candidateBarStyle.full" = "最闊";
 "padSettings.candidateBarStyle.ios" = "iOS 預設鍵盤";
+"padSettings.leftSysKey" = "左下角系統鍵";
+"padSettings.leftSysKey.description" = "喺某啲 iPad 型號，iOS 系統鍵盤最左下角個掣並唔係符號鍵盤掣，同其他 iPad 型號唔一致。啟用呢個設定可以放符號鍵盤掣喺左下角。";
+"padSettings.leftSysKey.default" = "預設";
+"padSettings.leftSysKey.keyboardType" = "符號鍵盤掣";
 
 "chineseInputSettings" = "中文輸入設定";
 "chineseInputSettings.enablePredictiveText" = "關聯字";
