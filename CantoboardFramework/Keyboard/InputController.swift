@@ -61,6 +61,7 @@ struct KeyboardState: Equatable {
     var isKeyboardAppearing: Bool
     var isInCaretMovingMode: Bool
     
+    
     var keyboardIdiom: LayoutIdiom
     
     var mainSchema: RimeSchema, reverseLookupSchema: RimeSchema?
@@ -137,6 +138,7 @@ class InputController: NSObject {
     private var replaceTextLen = 0;
 
     private var prevTextBefore: String?
+    var preText: String
     
     private(set) var candidateOrganizer: CandidateOrganizer!
     private var tenKeysController: TenKeysController!
@@ -194,8 +196,8 @@ class InputController: NSObject {
     }
     
     init(keyboardViewController: KeyboardViewController) {
+        preText = ""
         super.init()
-        
         self.keyboardViewController = keyboardViewController
         inputEngine = BilingualInputEngine(inputController: self, rimeSchema: state.mainSchema)
         candidateOrganizer = CandidateOrganizer(inputController: self)
@@ -808,17 +810,41 @@ class InputController: NSObject {
         // keyboardView?.state = state
         keyboardViewController?.keyboardView?.state = state
 //        let text = rimeInputEngine!.getCommitedText()
-        print(rimeInputEngine!.hasLoadedAllCandidates)
-        print(rimeInputEngine!.loadedCandidatesCount)
+//        print(rimeInputEngine!.hasLoadedAllCandidates)
+//        print(rimeInputEngine!.loadedCandidatesCount)
 //        let selectedTemp = rimeInputEngine!.selectCandidate(0)
         //        if (state.inputMode != .english && text.count > 0) {
-        if (state.inputMode != .english && rimeInputEngine!.hasLoadedAllCandidates == true && rimeInputEngine!.loadedCandidatesCount == 1) {
-            let text = rimeInputEngine!.selectCandidate(0)
+        if (state.inputMode != .english) {
+            var text = ""
+            if (rimeInputEngine!.loadedCandidatesCount > 0) {
+                text = rimeInputEngine!.rimeSession?.getCandidate(0) ?? ""
+            }
+            if (rimeInputEngine!.loadedCandidatesCount > 1) {
+                preText = text
+            }
+            else if (rimeInputEngine!.loadedCandidatesCount == 1 && rimeInputEngine!.hasLoadedAllCandidates == true) {
+                insertText(text)
+                clearInput()
+            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil) {
+                insertText(preText)
+                preText = ""
+                inputEngine.clearInput()
+                guard let char = vt!.first else { return }
+                              
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                  
+                      self.inputEngine.processChar(char)
+                  }
+        
 
+
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                    self.updateInputState(action, vt: vt)
+//                }
+            }
 //
           
-            insertText(text!)
-            clearInput()
+            
         }
 //        DDLogInfo(text)
         

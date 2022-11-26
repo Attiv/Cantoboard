@@ -112,7 +112,7 @@ public enum RimeSchema: String, Codable {
 }
 
 class RimeInputEngine: NSObject, InputEngine {
-    private weak var rimeSession: RimeSession?
+    public weak var rimeSession: RimeSession?
     private(set) var hasLoadedAllCandidates = false
     
     var schema: RimeSchema {

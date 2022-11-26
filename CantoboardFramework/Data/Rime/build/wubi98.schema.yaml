@@ -35,7 +35,7 @@ fixed:
   disable_user_dict_for_patterns:
     - "^z.*$"
   enable_charset_filter: false
-  enable_completion: true
+  enable_completion: false
   enable_encoder: false
   enable_sentence: false
   enable_user_dict: false
@@ -75,7 +75,7 @@ key_binder:
     - {accept: period, send: 1, when: has_menu}
   import_preset: default
 menu:
-  page_size: 500
+  page_size: 5
 punctuator:
   full_shape:
     " ": {commit: "　"}

@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1669457256
-    default.custom: 1669457255
+    default: 1669465745
+    default.custom: 1669465744
     xkjd6cx.custom: 0
-    xkjd6cx.schema: 1669457254
+    xkjd6cx.schema: 1669465743
 engine:
   filters:
     - uniquifier
@@ -28,7 +28,7 @@ engine:
     - table_translator
     - reverse_lookup_translator
 menu:
-  page_size: 5
+  page_size: 6
 schema:
   name: "键道6反查"
   schema_id: xkjd6cx
