@@ -1,10 +1,14 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1652537759
-    default.custom: 1652537758
+    default: 1669464087
+    default.custom: 1669464085
+    key_bindings: 1631897798
+    key_bindings.custom: 0
     numbers.custom: 0
-    numbers.schema: 1652537759
+    numbers.schema: 1669464087
+    punctuation: 1613228859
+    punctuation.custom: 0
 engine:
   processors:
     - key_binder

@@ -4,12 +4,16 @@ EN2en:
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1652537759
-    default.custom: 1652537758
-    symbols: 1652537759
+    default: 1669464087
+    default.custom: 1669464085
+    key_bindings: 1631897798
+    key_bindings.custom: 0
+    punctuation: 1613228859
+    punctuation.custom: 0
+    symbols: 1669464087
     symbols.custom: 0
     xkjd6.custom: 0
-    xkjd6.schema: 1652537759
+    xkjd6.schema: 1669464087
 ascii_punct:
   option_name: ascii_punct
 bmms:

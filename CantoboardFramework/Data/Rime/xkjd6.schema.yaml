@@ -406,7 +406,7 @@ speller:
     - "derive/^([bcdefghjklmnpqrstwxyz;`]{2}[avuio`]{5}).$/$1`/"
     - "derive/^[bcdefghjklmnpqrstwxyz;]{2}([avuio`]*)$/``$1/"
   alphabet: "zyxwvutsrqponmlkjihgfedcba;/=`"
-  auto_select: true
+  auto_select: false
   auto_select_unique_candidate: true
   initials: "abcdefghijklmnopqrstuvwxyz;/=`"
 switches:

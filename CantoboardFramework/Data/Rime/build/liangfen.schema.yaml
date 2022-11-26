@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1652537759
-    default.custom: 1652537758
+    default: 1669457256
+    default.custom: 1669457255
     liangfen.custom: 0
-    liangfen.schema: 1652537758
+    liangfen.schema: 1669457254
 engine:
   filters:
     - simplifier
@@ -79,7 +79,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["＊", "・", "·", "×", "※", "❂"]
+    "*": ["＊", "·", "・", "×", "※", "❂"]
     "+": "＋"
     ",": {commit: "，"}
     "-": "－"
@@ -99,9 +99,9 @@ punctuator:
     _: "——"
     "`": "｀"
     "{": ["『", "〖", "｛"]
-    "|": ["・", "｜", "§", "¦"]
+    "|": ["·", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": ["〜", "～", "〰"]
+    "~": "～"
   half_shape:
     "!": {commit: "！"}
     "\"": {pair: ["“", "”"]}
@@ -112,7 +112,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["*", "＊", "・", "·", "×", "※", "❂"]
+    "*": ["*", "＊", "·", "・", "×", "※", "❂"]
     "+": "+"
     ",": {commit: "，"}
     "-": "-"
@@ -132,17 +132,17 @@ punctuator:
     _: "——"
     "`": "`"
     "{": ["『", "〖", "｛"]
-    "|": ["・", "|", "｜", "§", "¦"]
+    "|": ["·", "|", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": ["~", "〜", "～", "〰"]
+    "~": ["~", "～"]
   import_preset: default
 recognizer:
   import_preset: default
   patterns:
-    email: "^[a-z][-_.0-9a-z]*@.*$"
+    email: "^[A-Za-z][-_.0-9A-Za-z]*@.*$"
     reverse_lookup: "`[a-z]*$"
     uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
-    url: "^(www[.]|https?:|ftp:|mailto:).*$|^[a-z]+[.].+$"
+    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
 reverse_lookup:
   dictionary: luna_pinyin
   preedit_format:

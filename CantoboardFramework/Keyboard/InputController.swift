@@ -807,29 +807,18 @@ class InputController: NSObject {
         
         // keyboardView?.state = state
         keyboardViewController?.keyboardView?.state = state
-        let text = rimeInputEngine!.getCommitedText()
-        
-        if (state.inputMode != .english && text.count > 0) {
-    
-       
-           
-            insertText(text)
+//        let text = rimeInputEngine!.getCommitedText()
+        print(rimeInputEngine!.hasLoadedAllCandidates)
+        print(rimeInputEngine!.loadedCandidatesCount)
+//        let selectedTemp = rimeInputEngine!.selectCandidate(0)
+        //        if (state.inputMode != .english && text.count > 0) {
+        if (state.inputMode != .english && rimeInputEngine!.hasLoadedAllCandidates == true && rimeInputEngine!.loadedCandidatesCount == 1) {
+            let text = rimeInputEngine!.selectCandidate(0)
+
+//
+          
+            insertText(text!)
             clearInput()
-            if (nil != vt && vt != "") {
-//                guard let char = vt!.first else { return }
-                
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                
-//                    self.inputEngine.processChar(char)
-//                }
-            
-            }
-            
-//            if ((action) != nil) {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-//                    self.handleKey(action!)
-//                }
-//            }
         }
 //        DDLogInfo(text)
         
