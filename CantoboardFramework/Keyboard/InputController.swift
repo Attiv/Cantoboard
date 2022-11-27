@@ -831,9 +831,9 @@ class InputController: NSObject {
                 inputEngine.clearInput()
                 guard let char = vt!.first else { return }
                               
-                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                  
-                      self.inputEngine.processChar(char)
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                      self.handleKey(action!)
+//                      self.inputEngine.processChar(char)
                   }
         
 

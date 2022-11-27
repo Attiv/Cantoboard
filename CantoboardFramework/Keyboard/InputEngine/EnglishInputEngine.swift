@@ -36,7 +36,12 @@ class InputTextBuffer {
         let isMovingLeft = offset < 0
         if isMovingLeft {
             guard caretIndex != _text.startIndex else { return false }
-            caretIndex = _text.index(before: caretIndex)
+            
+            do {
+               try caretIndex = _text.index(before: caretIndex)
+            } catch  {
+                print("caretIndex error")
+            }
             return true
         } else {
             guard caretIndex != _text.endIndex else { return false }
