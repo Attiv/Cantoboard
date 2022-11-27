@@ -825,10 +825,11 @@ class InputController: NSObject {
             else if (rimeInputEngine!.loadedCandidatesCount == 1 && rimeInputEngine!.hasLoadedAllCandidates == true) {
                 insertText(text)
                 clearInput()
-            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil) {
+            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil && action != KeyboardAction.space(SpaceKeyMode.space)) {
                 insertText(preText)
                 preText = ""
-                inputEngine.clearInput()
+                clearInput()
+//                inputEngine.clearInput()
 //                guard let char = vt!.first else { return }
                               
                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
