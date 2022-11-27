@@ -829,10 +829,12 @@ class InputController: NSObject {
                 insertText(preText)
                 preText = ""
                 inputEngine.clearInput()
-                guard let char = vt!.first else { return }
+//                guard let char = vt!.first else { return }
                               
                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                      self.handleKey(action!)
+                      if (action != nil) {
+                          self.handleKey(action!)
+                      }
 //                      self.inputEngine.processChar(char)
                   }
         

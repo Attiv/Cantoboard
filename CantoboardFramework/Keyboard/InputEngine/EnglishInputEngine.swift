@@ -38,7 +38,8 @@ class InputTextBuffer {
             guard caretIndex != _text.startIndex else { return false }
             
             do {
-               try caretIndex = _text.index(before: caretIndex)
+                try caretIndex = _text.endIndex
+//               try caretIndex = _text.index(before: caretIndex)
             } catch  {
                 print("caretIndex error")
             }
