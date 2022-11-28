@@ -815,6 +815,9 @@ class InputController: NSObject {
 //        let selectedTemp = rimeInputEngine!.selectCandidate(0)
         //        if (state.inputMode != .english && text.count > 0) {
         if (state.inputMode != .english) {
+            if (action == KeyboardAction.caretMovingMode(false) && preText.count > 0){
+                preText = ""
+            }
             var text = ""
             if (rimeInputEngine!.loadedCandidatesCount > 0) {
                 text = rimeInputEngine!.rimeSession?.getCandidate(0) ?? ""
