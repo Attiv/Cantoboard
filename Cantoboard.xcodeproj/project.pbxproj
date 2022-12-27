@@ -1812,7 +1812,7 @@
 				CODE_SIGN_ENTITLEMENTS = Cantoboard/Cantoboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = Cantoboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1836,7 +1836,7 @@
 				CODE_SIGN_ENTITLEMENTS = Cantoboard/Cantoboard.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = Cantoboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1902,7 +1902,7 @@
 				CODE_SIGN_ENTITLEMENTS = CantoboardExtension/CantoboardExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -1927,7 +1927,7 @@
 				CODE_SIGN_ENTITLEMENTS = CantoboardExtension/CantoboardExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = AVFY626F96;
 				INFOPLIST_FILE = CantoboardExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
