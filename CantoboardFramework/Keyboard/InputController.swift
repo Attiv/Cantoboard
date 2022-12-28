@@ -828,7 +828,7 @@ class InputController: NSObject {
             else if (rimeInputEngine!.loadedCandidatesCount == 1 && rimeInputEngine!.hasLoadedAllCandidates == true) {
                 insertText(text)
                 clearInput()
-            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil && action != KeyboardAction.space(SpaceKeyMode.space) && action != CantoboardFramework.KeyboardAction.newLine) {
+            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil && action != KeyboardAction.space(SpaceKeyMode.space) && action != CantoboardFramework.KeyboardAction.newLine && action != CantoboardFramework.KeyboardAction.caretMovingMode(true) && action != CantoboardFramework.KeyboardAction.moveCursorEnded) {
                 insertText(preText)
                 preText = ""
                 clearInput()
