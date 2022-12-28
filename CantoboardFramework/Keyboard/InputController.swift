@@ -11,6 +11,7 @@ import UIKit
 import CocoaLumberjackSwift
 import ZIPFoundation
 
+
 enum KeyboardEnableState: Equatable {
     case enabled, disabled, loading
 }
@@ -157,6 +158,11 @@ class InputController: NSObject {
     
     @objc func swipeUpNotify(notify: Notification) {
         let c = notify.userInfo?["value"] as! String
+        if (c == LocalizedStrings.keyTitleSelect) {
+            candidateSelected(choice: [0, 1], enableSmartSpace: true)
+            return
+            
+        }
         guard let textDocumentProxy = textDocumentProxy else { return }
         guard let char = c.first else { return }
         let isComposing = inputEngine.isComposing
