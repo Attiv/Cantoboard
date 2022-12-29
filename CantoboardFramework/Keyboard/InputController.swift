@@ -834,25 +834,20 @@ class InputController: NSObject {
             else if (rimeInputEngine!.loadedCandidatesCount == 1 && rimeInputEngine!.hasLoadedAllCandidates == true) {
                 insertText(text)
                 clearInput()
-            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil && action != KeyboardAction.space(SpaceKeyMode.space) && action != CantoboardFramework.KeyboardAction.newLine && action != CantoboardFramework.KeyboardAction.caretMovingMode(true) && action != CantoboardFramework.KeyboardAction.moveCursorEnded) {
+            } else if (rimeInputEngine!.loadedCandidatesCount == 0 && preText.count > 0 && vt != nil && action != KeyboardAction.space(SpaceKeyMode.space) && action != CantoboardFramework.KeyboardAction.newLine && action != CantoboardFramework.KeyboardAction.caretMovingMode(true) && action != CantoboardFramework.KeyboardAction.moveCursorEnded && action != CantoboardFramework.KeyboardAction.toggleInputMode(.mixed)) {
                 insertText(preText)
                 preText = ""
                 clearInput()
-//                inputEngine.clearInput()
-//                guard let char = vt!.first else { return }
+
                               
                   DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                       if (action != nil) {
                           self.handleKey(action!)
                       }
-//                      self.inputEngine.processChar(char)
+
                   }
         
 
-
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                    self.updateInputState(action, vt: vt)
-//                }
             }
 //
           
