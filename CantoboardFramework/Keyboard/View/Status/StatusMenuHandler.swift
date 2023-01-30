@@ -75,7 +75,8 @@ extension StatusMenuHandler where Self: BaseKeyboardView {
             [ .changeSchema(.stroke), .changeSchema(.mandarin) ],
         ] : [
             [ .changeSchema(.yale), .changeSchema(.jyutping), .changeSchema(.jyutping10keys), .toggleInputMode(.english, nil) ],
-            [ .changeSchema(.cangjie), .changeSchema(.quick), .changeSchema(.stroke), .changeSchema(.mandarin), .changeSchema(.yinxing), .changeSchema(.wubi) ],
+            [ .changeSchema(Settings.cached.cangjieVersion.toRimeSchema), .changeSchema(.quick), .changeSchema(.stroke), .changeSchema(.mandarin) ],
+//            [ .changeSchema(.cangjie), .changeSchema(.quick), .changeSchema(.stroke), .changeSchema(.mandarin), .changeSchema(.yinxing), .changeSchema(.wubi) ],
         ]
         
         let statusMenu = StatusMenu(menuRows: menuRows)
