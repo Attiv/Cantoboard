@@ -28,7 +28,7 @@ public enum RimeSchema: String, Codable {
     
     var signChar: String {
         switch self {
-        case .cangjie: return "倉"
+        case .cangjie3, .cangjie5: return "倉"
         case .yale: return "耶"
 //        case .yale: return "五"
         case .quick: return "速"
@@ -47,7 +47,7 @@ public enum RimeSchema: String, Codable {
     
     var shortName: String {
         switch self {
-        case .cangjie: return "倉頡"
+        case .cangjie3, .cangjie5: return "倉頡"
         case .yale: return "耶魯"
 //        case .yale: return "五笔"
         case .quick: return "速成"
@@ -82,11 +82,11 @@ public enum RimeSchema: String, Codable {
     }
     
     var isCangjieFamily: Bool {
-        self == .cangjie || self == .quick
+        self == .cangjie3 || self == .cangjie5 || self == .quick
     }
     
     var isShapeBased: Bool {
-        self == .cangjie || self == .quick || self == .stroke
+        self == .cangjie3 || self == .cangjie5 || self == .quick || self == .stroke
     }
     
     var isCantonese: Bool {
