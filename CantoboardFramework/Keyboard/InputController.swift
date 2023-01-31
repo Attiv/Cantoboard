@@ -162,7 +162,7 @@ class InputController: NSObject {
     }
     
     @objc func swipeUpNotify(notify: Notification) {
-        let c = notify.userInfo?["value"] as! String
+        var c = notify.userInfo?["value"] as! String
         if (c == LocalizedStrings.keyTitleSelect) {
             candidateSelected(choice: [0, 1], enableSmartSpace: true)
             return
@@ -184,6 +184,9 @@ class InputController: NSObject {
             shouldFeedCharToInputEngine = char.isEnglishLetter && c.count == 1
         }
         if !(shouldFeedCharToInputEngine && inputEngine.processChar(char)) {
+            if (c == "确认" || c == "完成") {
+                c = " \n"
+            }
             if !insertComposingText(appendBy: c) {
                 insertText(c)
             }
