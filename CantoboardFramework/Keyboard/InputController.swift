@@ -184,7 +184,7 @@ class InputController: NSObject {
             shouldFeedCharToInputEngine = char.isEnglishLetter && c.count == 1
         }
         if !(shouldFeedCharToInputEngine && inputEngine.processChar(char)) {
-            if (c == "确认" || c == "完成") {
+            if (c == "确认" || c == "完成" || c == "传送") {
                 c = " \n"
             }
             if !insertComposingText(appendBy: c) {
