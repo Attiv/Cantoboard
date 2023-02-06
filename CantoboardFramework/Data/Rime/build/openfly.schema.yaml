@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1669465745
-    default.custom: 1669465744
-    openfly.custom: 1669465744
-    openfly.schema: 1669465744
+    default: 1675679786
+    default.custom: 1675679786
+    openfly.custom: 1675679786
+    openfly.schema: 1675679786
 engine:
   filters:
     - "lua_filter@openfly_hint_filter"

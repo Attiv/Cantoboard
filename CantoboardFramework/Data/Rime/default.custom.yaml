@@ -47,16 +47,20 @@ patch:
     Shift_L: null
     Shift_R: null
   schema_list:
-  - schema: openfly
-  - schema: xhup
-  - schema: xhup_express
-  - schema: xhup_fluency
-  - schema: wubi86_jidian
-  - schema: numbers
-  - schema: wubi86_jidian_pinyin
-  - schema: wubi86_jidian_trad
-  - schema: wubi86_jidian_trad_pinyin
   - schema: xkjd6
+  - {schema: jyut6ping3}
+  - {schema: jyut6ping3vxq}
+  - {schema: yale}
+  - {schema: yalevxq}
+  - {schema: cangjie3}
+  - {schema: cangjie5}
+  - {schema: quick5}
+  - {schema: luna_pinyin}
+  - {schema: stroke}
+  - {schema: loengfan}
+  - {schema: jyut6ping3_10keys}
+  - {schema: openfly}
+  
   # - schema: double_pinyin_flypy
 __patch:
 # Rx: amorphobia/openfly:: {

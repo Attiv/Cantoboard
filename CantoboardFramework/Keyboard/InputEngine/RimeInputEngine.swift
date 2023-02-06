@@ -83,6 +83,10 @@ public enum RimeSchema: String, Codable {
         self == .yinxing || self == .wubi
     }
     
+    var isJD6: Bool {
+        self == .wubi
+    }
+    
     var isCangjieFamily: Bool {
         self == .cangjie3 || self == .cangjie5 || self == .quick
     }

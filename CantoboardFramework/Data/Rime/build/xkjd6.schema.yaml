@@ -4,12 +4,12 @@ EN2en:
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1669465745
-    default.custom: 1669465744
-    symbols: 1669465745
+    default: 1675679786
+    default.custom: 1675679786
+    symbols: 1675679786
     symbols.custom: 0
     xkjd6.custom: 0
-    xkjd6.schema: 1669465745
+    xkjd6.schema: 1675679786
 ascii_punct:
   option_name: ascii_punct
 bmms:
@@ -29,6 +29,7 @@ emoji_cn:
   tips: all
 engine:
   filters:
+    - "lua_filter@hint_filter"
     - simplifier
     - "reverse_lookup_filter@pinyin_simp_lookup"
     - "reverse_lookup_filter@quanpinerfen_lookup"
@@ -38,6 +39,7 @@ engine:
     - "simplifier@EN2en"
     - "simplifier@ascii_punct"
     - "lua_filter@xkjd6_filter"
+    - "lua_filter@preedit_filter"
     - uniquifier
   processors:
     - "lua_processor@xuanchongjsq"
@@ -408,6 +410,9 @@ switches:
     states: ["关闭emj", "开启emj"]
   - name: ascii_punct
     states: ["。，", "．，"]
+  - name: wxw_hint
+    reset: 1
+    states: ["关₆₃₀", "开₆₃₀"]
 topup:
   auto_clear: true
   max_length: 6

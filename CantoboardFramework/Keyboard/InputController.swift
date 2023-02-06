@@ -829,7 +829,7 @@ class InputController: NSObject {
 //        print(rimeInputEngine!.loadedCandidatesCount)
 //        let selectedTemp = rimeInputEngine!.selectCandidate(0)
         //        if (state.inputMode != .english && text.count > 0) {
-        if (state.inputMode != .english) {
+        if (state.inputMode != .english && inputEngine.rimeSchema.isJD6) {
             if (action == KeyboardAction.caretMovingMode(false) && preText.count > 0){
                 preText = ""
             }
