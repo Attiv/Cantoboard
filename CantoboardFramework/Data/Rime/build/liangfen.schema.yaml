@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1680757007
-    default.custom: 1680757007
+    default: 1680777502
+    default.custom: 1680777502
     liangfen.custom: 0
-    liangfen.schema: 1680757007
+    liangfen.schema: 1680777502
 engine:
   filters:
     - simplifier

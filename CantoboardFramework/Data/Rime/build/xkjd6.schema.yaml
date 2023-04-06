@@ -4,12 +4,12 @@ EN2en:
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1680757007
-    default.custom: 1680757007
-    symbols: 1680757007
+    default: 1680777502
+    default.custom: 1680777502
+    symbols: 1680777502
     symbols.custom: 0
     xkjd6.custom: 0
-    xkjd6.schema: 1680757007
+    xkjd6.schema: 1680777502
 ascii_punct:
   option_name: ascii_punct
 bmms:
@@ -391,7 +391,7 @@ speller:
     - "derive/[0-9]$//"
     - "derive|^;|/|"
   alphabet: "zyxwvutsrqponmlkjihgfedcba;"
-  auto_select: true
+  auto_select: false
   delimiter: " '"
   initials: "abcdefghijklmnopqrstuvwxyz;"
 switches:

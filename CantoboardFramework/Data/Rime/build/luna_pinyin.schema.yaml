@@ -1,19 +1,19 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1680756504
-    default.custom: 1680756503
+    default: 1680777502
+    default.custom: 1680777502
     grammar: 1613228859
     grammar.custom: 0
     key_bindings: 1624545838
     key_bindings.custom: 0
     luna_pinyin.custom: 0
-    luna_pinyin.schema: 1680756503
+    luna_pinyin.schema: 1680777502
     pinyin: 1613228859
     pinyin.custom: 0
     punctuation: 1613228859
     punctuation.custom: 0
-    symbols: 1680756503
+    symbols: 1680777502
     symbols.custom: 0
 custom_phrase:
   db_class: stabledb

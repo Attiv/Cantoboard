@@ -1,8 +1,8 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1680757007
-    default.custom: 1680757007
+    default: 1680777502
+    default.custom: 1680777502
     key_bindings: 1631897798
     key_bindings.custom: 0
     punctuation: 1613228859
@@ -133,6 +133,18 @@ recognizer:
     url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
 schema_list:
   - schema: xkjd6
+  - schema: jyut6ping3
+  - schema: jyut6ping3vxq
+  - schema: yale
+  - schema: yalevxq
+  - schema: cangjie3
+  - schema: cangjie5
+  - schema: quick5
+  - schema: luna_pinyin
+  - schema: stroke
+  - schema: loengfan
+  - schema: jyut6ping3_10keys
+  - schema: openfly
 switcher:
   abbreviate_options: true
   caption: "〔方案選單〕"
