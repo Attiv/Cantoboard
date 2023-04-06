@@ -1,9 +1,10 @@
-# Rime schema settings
+﻿# Rime schema settings
 # encoding: utf-8
 
 schema:
   schema_id: xkjd6
-  name: 键道6
+  # name: 键道6
+  name: Attiv
   version: "1"
   dependencies:
     - xkjd6cx
@@ -43,7 +44,10 @@ switches:
 
   - options: [_key_']
     states: [造词]
-
+  # - name: emoji_suggestion
+  #   reset: 0
+  #   states: [ "🈚️️\uFE0E", "🈶️️\uFE0F" ]
+    
   - name: emoji_cn   #Emoji开关
     reset: 1              # 1为默认开启
     states: [ 关闭emj,开启emj  ]
@@ -52,6 +56,9 @@ switches:
   - name: wxw_hint # 逐码是否显示630
     reset: 1
     states: [ "关₆₃₀", "开₆₃₀" ]
+  - name: completion
+    reset: 1
+    states: [ 逐码关, 逐码开 ]
 
 punctuator:
   import_preset: symbols
@@ -107,7 +114,8 @@ punctuator:
     '!' : { commit: ！ }
     '@' : '@'
     '#' : '#'
-    '%' : [ '%', ％, '°', '℃' ]
+    '%' : '%'
+    # '%' : [ '%', ％, '°', '℃' ]
     '$' : [ ￥, '$', '€', '£', '¥', '¢', '¤' ]
     '^' : { commit: …… }
     '&' : '&'
@@ -164,11 +172,9 @@ engine:
     - script_translator@quanpinerfen
     - script_translator@pinyin_simp
   filters:
-    - lua_filter@hint_filter # 頂功提示過濾 switches/completion = 1
-    - simplifier
-    - reverse_lookup_filter@pinyin_simp_lookup
-    - reverse_lookup_filter@quanpinerfen_lookup
+    # - lua_filter@hint_filter # 頂功提示過濾 switches/completion = 1
     - simplifier@emoji_cn
+    - simplifier
     - simplifier@jffh
     - simplifier@bmms
     - simplifier@EN2en
@@ -176,15 +182,23 @@ engine:
     - lua_filter@xkjd6_filter
     - lua_filter@preedit_filter
     - uniquifier
+    - reverse_lookup_filter@pinyin_simp_lookup
+    - reverse_lookup_filter@quanpinerfen_lookup
 
 speller:
-  auto_select: false
+  auto_select: true
   alphabet: "zyxwvutsrqponmlkjihgfedcba;"
   initials: "abcdefghijklmnopqrstuvwxyz;"
   delimiter: " '"
   algebra: 
     - derive/[0-9]$//  #无数字
     - derive|^;|/|
+
+emoji_suggestion:
+  opencc_config: emoji.json
+  option_name: emoji_suggestion
+  tips: all
+
 
 translator:
   dictionary: xkjd6.extended
@@ -349,8 +363,9 @@ key_binder:
     # - {accept: bracketright, send: Page_Down, when: has_menu} # ]下翻页
     - { when: always, accept: F6, select: .next }
     - { when: always, accept: F7, toggle: jffh }
+    # - { when: always, accept: "#", toggle: emoji_cn }
     # - { when: has_menu, accept: "'", send: 2 }
-    - { when: has_menu, accept: "&", toggle: emoji_cn}
+    # - { when: has_menu, accept: "&", toggle: emoji_cn}
     - { when: has_menu, accept: "^", toggle: bmms}
     - {accept: KP_0, send: 0, when: composing}
     - {accept: KP_1, send: 1, when: composing}

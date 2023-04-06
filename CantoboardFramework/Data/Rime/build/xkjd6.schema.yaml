@@ -4,12 +4,12 @@ EN2en:
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1675679786
-    default.custom: 1675679786
-    symbols: 1675679786
+    default: 1680757007
+    default.custom: 1680757007
+    symbols: 1680757007
     symbols.custom: 0
     xkjd6.custom: 0
-    xkjd6.schema: 1675679786
+    xkjd6.schema: 1680757007
 ascii_punct:
   option_name: ascii_punct
 bmms:
@@ -27,13 +27,14 @@ emoji_cn:
   opencc_config: emoji.json
   option_name: emoji_cn
   tips: all
+emoji_suggestion:
+  opencc_config: emoji.json
+  option_name: emoji_suggestion
+  tips: all
 engine:
   filters:
-    - "lua_filter@hint_filter"
-    - simplifier
-    - "reverse_lookup_filter@pinyin_simp_lookup"
-    - "reverse_lookup_filter@quanpinerfen_lookup"
     - "simplifier@emoji_cn"
+    - simplifier
     - "simplifier@jffh"
     - "simplifier@bmms"
     - "simplifier@EN2en"
@@ -41,6 +42,8 @@ engine:
     - "lua_filter@xkjd6_filter"
     - "lua_filter@preedit_filter"
     - uniquifier
+    - "reverse_lookup_filter@pinyin_simp_lookup"
+    - "reverse_lookup_filter@quanpinerfen_lookup"
   processors:
     - "lua_processor@xuanchongjsq"
     - ascii_composer
@@ -95,7 +98,6 @@ key_binder:
     - {accept: period, send: Page_Down, when: has_menu}
     - {accept: F6, select: .next, when: always}
     - {accept: F7, toggle: jffh, when: always}
-    - {accept: "&", toggle: emoji_cn, when: has_menu}
     - {accept: "^", toggle: bmms, when: has_menu}
     - {accept: KP_0, send: 0, when: composing}
     - {accept: KP_1, send: 1, when: composing}
@@ -183,7 +185,7 @@ punctuator:
     "\"": {pair: ["“", "”"]}
     "#": "#"
     "$": ["￥", "$", "€", "£", "¥", "¢", "¤"]
-    "%": ["%", "％", "°", "℃"]
+    "%": "%"
     "&": "&"
     "'": {pair: ["‘", "’"]}
     "(": "（"
@@ -381,7 +383,7 @@ schema:
     - xkjd6cx
     - pinyin_simp
     - liangfen
-  name: "键道6"
+  name: Attiv
   schema_id: xkjd6
   version: 1
 speller:
@@ -389,7 +391,7 @@ speller:
     - "derive/[0-9]$//"
     - "derive|^;|/|"
   alphabet: "zyxwvutsrqponmlkjihgfedcba;"
-  auto_select: false
+  auto_select: true
   delimiter: " '"
   initials: "abcdefghijklmnopqrstuvwxyz;"
 switches:
@@ -413,6 +415,9 @@ switches:
   - name: wxw_hint
     reset: 1
     states: ["关₆₃₀", "开₆₃₀"]
+  - name: completion
+    reset: 1
+    states: ["逐码关", "逐码开"]
 topup:
   auto_clear: true
   max_length: 6

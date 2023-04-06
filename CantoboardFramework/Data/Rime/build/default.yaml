@@ -1,17 +1,34 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1639099840
-    default.custom: 1672707832
+    default: 1680757007
+    default.custom: 1680757007
+    key_bindings: 1631897798
+    key_bindings.custom: 0
+    punctuation: 1613228859
+    punctuation.custom: 0
 ascii_composer:
+  good_old_caps_lock: true
   switch_key:
     Control_L: noop
     Control_R: noop
-    Shift_L: inline_ascii
-    Shift_R: commit_text
-config_version: 0.15.minimal
+config_version: 0.40
+emoji_cn:
+  opencc_config: emoji.json
+  option_name: emoji_cn
+  tips: all
+engine:
+  filters:
+    - "simplifier@emoji_cn"
 key_binder:
   bindings:
+    - {accept: bracketleft, send: Page_Up, when: has_menu}
+    - {accept: bracketright, send: Page_Down, when: has_menu}
+    - {accept: ";", send: 2, when: composing}
+    - {accept: comma, send: 3, when: composing}
+    - {accept: Tab, send: Escape, when: composing}
+    - {accept: "Release+semicolon", send: semicolon, when: composing}
+    - {accept: "Release+comma", send: comma, when: composing}
     - {accept: "Control+p", send: Up, when: composing}
     - {accept: "Control+n", send: Down, when: composing}
     - {accept: "Control+b", send: Left, when: composing}
@@ -20,25 +37,27 @@ key_binder:
     - {accept: "Control+e", send: End, when: composing}
     - {accept: "Control+d", send: Delete, when: composing}
     - {accept: "Control+k", send: "Shift+Delete", when: composing}
+    - {accept: "Control+h", send: BackSpace, when: composing}
     - {accept: "Control+g", send: Escape, when: composing}
+    - {accept: "Control+bracketleft", send: Escape, when: composing}
     - {accept: "Alt+v", send: Page_Up, when: composing}
     - {accept: "Control+v", send: Page_Down, when: composing}
-    - {accept: ISO_Left_Tab, send: "Shift+Left", when: composing}
-    - {accept: "Shift+Tab", send: "Shift+Left", when: composing}
-    - {accept: Tab, send: "Shift+Right", when: composing}
-    - {accept: minus, send: Page_Up, when: paging}
-    - {accept: equal, send: Page_Down, when: has_menu}
-    - {accept: comma, send: Page_Up, when: paging}
-    - {accept: period, send: Page_Down, when: has_menu}
+    - {accept: ISO_Left_Tab, send: Page_Up, when: composing}
+    - {accept: "Shift+Tab", send: Page_Up, when: composing}
     - {accept: "Control+Shift+1", select: .next, when: always}
     - {accept: "Control+Shift+2", toggle: ascii_mode, when: always}
     - {accept: "Control+Shift+3", toggle: full_shape, when: always}
     - {accept: "Control+Shift+4", toggle: simplification, when: always}
     - {accept: "Control+Shift+5", toggle: extended_charset, when: always}
+    - {accept: "Control+Shift+exclam", select: .next, when: always}
+    - {accept: "Control+Shift+at", toggle: ascii_mode, when: always}
+    - {accept: "Control+Shift+numbersign", toggle: full_shape, when: always}
+    - {accept: "Control+Shift+dollar", toggle: simplification, when: always}
+    - {accept: "Control+Shift+percent", toggle: extended_charset, when: always}
     - {accept: "Shift+space", toggle: full_shape, when: always}
     - {accept: "Control+period", toggle: ascii_punct, when: always}
 menu:
-  page_size: 500
+  page_size: 6
 punctuator:
   full_shape:
     " ": {commit: "　"}
@@ -51,7 +70,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["＊", "・", "·", "×", "※", "❂"]
+    "*": ["＊", "·", "・", "×", "※", "❂"]
     "+": "＋"
     ",": {commit: "，"}
     "-": "－"
@@ -71,9 +90,9 @@ punctuator:
     _: "——"
     "`": "｀"
     "{": ["『", "〖", "｛"]
-    "|": ["・", "｜", "§", "¦"]
+    "|": ["·", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": ["〜", "～", "〰"]
+    "~": "～"
   half_shape:
     "!": {commit: "！"}
     "\"": {pair: ["“", "”"]}
@@ -84,7 +103,7 @@ punctuator:
     "'": {pair: ["‘", "’"]}
     "(": "（"
     ")": "）"
-    "*": ["*", "＊", "・", "·", "×", "※", "❂"]
+    "*": ["*", "＊", "·", "・", "×", "※", "❂"]
     "+": "+"
     ",": {commit: "，"}
     "-": "-"
@@ -104,26 +123,16 @@ punctuator:
     _: "——"
     "`": "`"
     "{": ["『", "〖", "｛"]
-    "|": ["・", "|", "｜", "§", "¦"]
+    "|": ["·", "|", "｜", "§", "¦"]
     "}": ["』", "〗", "｝"]
-    "~": ["~", "〜", "～", "〰"]
+    "~": ["~", "～"]
 recognizer:
   patterns:
-    email: "^[a-z][-_.0-9a-z]*@.*$"
+    email: "^[A-Za-z][-_.0-9A-Za-z]*@.*$"
     uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
-    url: "^(www[.]|https?:|ftp:|mailto:).*$|^[a-z]+[.].+$"
+    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
 schema_list:
-  - schema: jyut6ping3
-  - schema: jyut6ping3vxq
-  - schema: yale
-  - schema: yalevxq
-  - schema: cangjie3
-  - schema: cangjie5
-  - schema: quick5
-  - schema: luna_pinyin
-  - schema: stroke
-  - schema: loengfan
-  - schema: jyut6ping3_10keys
+  - schema: xkjd6
 switcher:
   abbreviate_options: true
   caption: "〔方案選單〕"
@@ -134,7 +143,8 @@ switcher:
     - F4
   option_list_separator: "／"
   save_options:
-    - full_shape
-    - ascii_punct
-    - simplification
-    - extended_charset
+    - openfly_enable_2nd_short
+switches:
+  - name: emoji_cn
+    reset: 1
+    states: ["关闭emj", "开启emj"]

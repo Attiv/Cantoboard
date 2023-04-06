@@ -1,10 +1,10 @@
 __build_info:
   rime_version: 1.7.3
   timestamps:
-    default: 1675679786
-    default.custom: 1675679786
+    default: 1680757007
+    default.custom: 1680757007
     xkjd6cx.custom: 0
-    xkjd6cx.schema: 1675679786
+    xkjd6cx.schema: 1680757007
 engine:
   filters:
     - uniquifier
